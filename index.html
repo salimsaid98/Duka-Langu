@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="sw" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DukaLangu Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--a:#f5a623;--g:#3ecf8e;--r:#f04444;--b:#4f8ef7;--rad:14px;}
+[data-theme=dark]{--bg:#0d0c0b;--sf:#161513;--c:#1e1c19;--c2:#252320;--br:#2c2a26;--tx:#f0ece3;--t2:#a09890;--t3:#5a5650;--ib:#111010;}
+[data-theme=light]{--bg:#f5f3ef;--sf:#fff;--c:#fff;--c2:#f0ede8;--br:#e0dbd3;--tx:#1a1814;--t2:#6b6560;--t3:#aaa49e;--ib:#f8f6f2;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;font-size:14px;}
+
+/* LOGIN */
+#LS{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.lbox{background:var(--c);border:1px solid var(--br);border-radius:20px;padding:32px 24px;width:100%;max-width:340px;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--a);text-align:center;margin-bottom:2px;}
+.logo span{color:var(--tx);}
+.lsub{text-align:center;color:var(--t2);font-size:11px;margin-bottom:20px;}
+.url-row{background:var(--c2);border:1px solid var(--br);border-radius:10px;padding:10px;margin-bottom:14px;}
+.url-row label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);display:block;margin-bottom:4px;}
+.url-row input{width:100%;background:var(--ib);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);font-size:11px;font-family:inherit;}
+.url-row input:focus{outline:none;border-color:var(--a);}
+.fl{margin-bottom:10px;}
+.fl label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--t2);margin-bottom:4px;}
+.fl input,.fl select{width:100%;background:var(--ib);border:1px solid var(--br);border-radius:8px;padding:10px 12px;color:var(--tx);font-family:inherit;font-size:13px;}
+.fl input:focus{outline:none;border-color:var(--a);}
+.lbtn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-top:6px;position:relative;}
+.lhint{text-align:center;font-size:11px;color:var(--t3);margin-top:10px;}
+
+/* APP */
+#AS{display:none;flex-direction:column;min-height:100vh;}
+.top{background:var(--sf);border-bottom:1px solid var(--br);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tlogo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--a);}
+.tlogo span{color:var(--tx);}
+.tr{display:flex;align-items:center;gap:8px;}
+.ubadge{background:var(--c2);border:1px solid var(--br);border-radius:6px;padding:3px 9px;font-size:11px;color:var(--t2);}
+.ibtn{background:var(--c);border:1px solid var(--br);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;}
+
+/* Sync bar */
+.sbar{background:var(--sf);border-bottom:1px solid var(--br);padding:4px 14px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--t3);}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--t3);display:inline-block;margin-right:5px;transition:background .3s;}
+.sdot.ok{background:var(--g);}
+.sdot.err{background:var(--r);}
+.sdot.spin{background:var(--a);animation:pulse .8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.sbtn{background:var(--c2);border:1px solid var(--br);border-radius:5px;padding:2px 8px;color:var(--t2);font-size:10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;}
+
+/* Nav */
+.nav{background:var(--sf);border-top:1px solid var(--br);display:flex;position:fixed;bottom:0;left:0;right:0;z-index:50;}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;cursor:pointer;gap:2px;border-top:2px solid transparent;}
+.ni.on{border-top-color:var(--a);}
+.ni .ic{font-size:17px;}
+.ni .lb{font-size:9px;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);}
+.ni.on .lb{color:var(--a);}
+.ni.hide{display:none;}
+
+/* Pages */
+.pg{display:none;padding:12px 14px 80px;}
+.pg.on{display:block;}
+
+/* Summary */
+.ss{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.sc{background:var(--c);border:1px solid var(--br);border-radius:var(--rad);padding:10px;text-align:center;}
+.sc .sl{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:3px;}
+.sc .sv{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.cr{color:var(--r);}.cg{color:var(--g);}.co{color:var(--a);}.cb{color:var(--b);}
+
+/* Cards */
+.card{background:var(--c);border:1px solid var(--br);border-radius:var(--rad);margin-bottom:8px;overflow:hidden;}
+.crow{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;}
+.cn{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.cs{font-size:11px;color:var(--t2);margin-top:2px;}
+.bdg{padding:3px 8px;border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;}
+.br2{background:rgba(240,68,68,.12);color:var(--r);}
+.bg2{background:rgba(62,207,142,.12);color:var(--g);}
+.bo2{background:rgba(245,166,35,.12);color:var(--a);}
+.bb2{background:rgba(79,142,247,.12);color:var(--b);}
+.cbody{display:none;border-top:1px solid var(--br);padding:12px 14px;}
+.cbody.on{display:block;}
+.ir{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--br);}
+.ir:last-child{border:none;}
+.ik{color:var(--t2);}.iv{font-weight:500;}
+.ar{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;}
+.btn{border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;padding:7px 11px;white-space:nowrap;}
+.bg{background:var(--g);color:#000;}.bo{background:var(--a);color:#000;}
+.bwa{background:#25D366;color:#000;}.bsms{background:var(--b);color:#fff;}
+.br3{background:rgba(240,68,68,.15);color:var(--r);border:1px solid rgba(240,68,68,.25);}
+.bgh{background:var(--c2);color:var(--t2);border:1px solid var(--br);}
+
+/* Forms */
+.fc{background:var(--c);border:1px solid var(--br);border-radius:var(--rad);padding:14px;margin-bottom:10px;}
+.ft{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--a);margin-bottom:12px;}
+.fl2{margin-bottom:10px;}
+.fl2 label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--t2);margin-bottom:4px;}
+.fl2 input,.fl2 select{width:100%;background:var(--ib);border:1px solid var(--br);border-radius:8px;padding:9px 12px;color:var(--tx);font-family:inherit;font-size:13px;}
+.fl2 input:focus,.fl2 select:focus{outline:none;border-color:var(--a);}
+.fl2 select option{background:var(--sf);}
+.fsub{width:100%;padding:12px;border-radius:10px;border:none;background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-top:10px;}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.st{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--t2);}
+.sa2{font-size:11px;color:var(--a);cursor:pointer;font-weight:600;}
+.pills{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+.pill{padding:4px 11px;border-radius:20px;border:1px solid var(--br);background:var(--c);color:var(--t2);font-size:11px;font-family:'Syne',sans-serif;font-weight:600;cursor:pointer;}
+.pill.on{background:var(--a);color:#000;border-color:var(--a);}
+.sw{position:relative;margin-bottom:10px;}
+.sw input{width:100%;background:var(--c);border:1px solid var(--br);border-radius:10px;padding:9px 12px 9px 32px;color:var(--tx);font-family:inherit;font-size:13px;}
+.sw input:focus{outline:none;border-color:var(--a);}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:12px;}
+.df{display:flex;gap:6px;margin-bottom:10px;align-items:center;}
+.df input{flex:1;background:var(--c);border:1px solid var(--br);border-radius:8px;padding:7px 10px;color:var(--tx);font-size:12px;font-family:inherit;}
+.df input:focus{outline:none;border-color:var(--a);}
+.df span{color:var(--t3);font-size:11px;}
+
+/* Products grid */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.pt{background:var(--c2);border:1px solid var(--br);border-radius:10px;padding:10px;}
+.ptop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.pic{font-size:22px;}.pn{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;}.pp{font-size:10px;color:var(--a);}
+.qc{display:flex;align-items:center;gap:6px;}
+.qb{width:28px;height:28px;border-radius:6px;border:1px solid var(--br);background:var(--c);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.qi{width:42px;background:var(--ib);border:1px solid var(--br);border-radius:6px;color:var(--tx);font-family:'Syne',sans-serif;font-weight:800;font-size:15px;text-align:center;padding:3px 2px;}
+.tbar{display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;border-top:1px solid var(--br);margin-top:10px;}
+.tl{font-size:12px;color:var(--t2);}
+.tv{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--a);}
+
+/* Profile */
+.ph{background:var(--c);border:1px solid var(--br);border-radius:var(--rad);padding:16px;margin-bottom:10px;text-align:center;}
+.pav{width:52px;height:52px;border-radius:50%;background:var(--a);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#000;margin:0 auto 8px;}
+.pname{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;}
+.pph{font-size:12px;color:var(--t2);margin-top:2px;}
+.tl2{margin-top:10px;}
+.ti{display:flex;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--br);}
+.ti:last-child{border:none;margin:0;padding:0;}
+.td{width:9px;height:9px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.td.ord{background:var(--r);}.td.pay{background:var(--g);}
+.tinfo{flex:1;}
+.ttl{font-size:13px;font-weight:600;}
+.tmeta{font-size:11px;color:var(--t2);margin-top:1px;}
+.tam{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;}
+
+/* Reports */
+.rc{background:var(--c);border:1px solid var(--br);border-radius:var(--rad);padding:13px;margin-bottom:10px;}
+.rt{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:10px;}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.si2{background:var(--c2);border-radius:8px;padding:10px;}
+.sl2{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.sv2{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;}
+.tlist{margin-top:8px;}
+.ti2{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--br);font-size:12px;}
+.ti2:last-child{border:none;}
+.rbdg{width:20px;height:20px;border-radius:50%;background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;}
+.bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;}
+.blbl{width:80px;color:var(--t2);text-align:right;flex-shrink:0;}
+.btr{flex:1;background:var(--c2);border-radius:4px;height:18px;overflow:hidden;}
+.bfill{height:100%;background:var(--a);border-radius:4px;display:flex;align-items:center;padding-left:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:10px;color:#000;transition:width .5s;}
+
+/* Logs */
+.li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--br);font-size:12px;}
+.li:last-child{border:none;}
+.la{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;}
+.ld{font-size:11px;color:var(--t2);}
+.lt{font-size:10px;color:var(--t3);}
+
+/* Modals */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:flex-end;justify-content:center;}
+.ov.on{display:flex;}
+.mod{background:var(--sf);border:1px solid var(--br);border-radius:18px 18px 0 0;padding:20px 18px 28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.mt{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:14px;}
+.mft{display:flex;gap:8px;margin-top:12px;}
+.mcan{flex:0 0 70px;padding:11px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--t2);font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--g);color:#000;padding:10px 16px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;transition:transform .3s;z-index:300;white-space:nowrap;}
+.toast.on{transform:translateX(-50%) translateY(0);}
+.toast.err{background:var(--r);color:#fff;}
+
+/* Success popup */
+.pop{display:none;position:fixed;inset:0;z-index:400;align-items:center;justify-content:center;background:rgba(0,0,0,.6);}
+.pop.on{display:flex;}
+.pbox{background:var(--sf);border:1px solid var(--br);border-radius:20px;padding:28px 24px;text-align:center;max-width:280px;width:90%;animation:pin .3s;}
+@keyframes pin{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.pic2{font-size:48px;margin-bottom:10px;}
+.ptl{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:5px;}
+.psb{font-size:12px;color:var(--t2);margin-bottom:18px;}
+.pbtn{padding:10px 24px;border-radius:10px;border:none;background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+
+/* Settings */
+.set{display:flex;justify-content:space-between;align-items:center;padding:13px;background:var(--c);border:1px solid var(--br);border-radius:var(--rad);margin-bottom:8px;}
+.setl{font-size:13px;font-weight:600;}
+.sets{font-size:11px;color:var(--t2);margin-top:2px;}
+.tog{width:42px;height:23px;border-radius:12px;background:var(--br);border:none;cursor:pointer;position:relative;transition:background .2s;}
+.tog.on{background:var(--a);}
+.tog::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+.tog.on::after{left:22px;}
+
+/* Loading btn */
+.ldg{pointer-events:none;opacity:.7;}
+.ldg::after{content:'';position:absolute;width:14px;height:14px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;right:14px;top:50%;transform:translateY(-50%);animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:translateY(-50%) rotate(360deg);}}
+
+.empty{text-align:center;padding:30px 20px;color:var(--t3);}
+.empty .ei{font-size:36px;margin-bottom:8px;}
+.empty p{font-size:12px;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--br);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="LS">
+  <div class="lbox">
+    <div class="logo">Duka<span>Langu</span></div>
+    <div class="lsub">Mfumo wa Biashara ya Mikate &amp; Maandazi</div>
+
+    <div class="fl"><label>Jina la Mtumiaji</label><input type="text" id="lu" placeholder="admin"></div>
+    <div class="fl"><label>Nywila</label><input type="password" id="lp" placeholder="••••••"></div>
+    <button class="lbtn" id="loginBtn" onclick="doLogin()">Ingia →</button>
+    <!-- <div class="lhint">Default: admin / 1234</div> -->
+  </div>
+</div>
+
+<!-- APP -->
+<div id="AS">
+  <div class="top">
+    <div class="tlogo">Duka<span>Langu</span></div>
+    <div class="tr">
+      <div class="ubadge" id="ub">—</div>
+      <div class="ibtn" onclick="toggleTheme()" id="thbtn">☀️</div>
+      <div class="ibtn" onclick="logout()">🚪</div>
+    </div>
+  </div>
+  <div class="sbar">
+    <div><span class="sdot" id="sdot"></span><span id="stxt">—</span></div>
+    <button class="sbtn" onclick="manualSync()">↻ Sync</button>
+  </div>
+
+  <!-- HOME -->
+  <div class="pg on" id="pg-home">
+    <div class="ss" style="margin-top:6px">
+      <div class="sc"><div class="sl">Madeni</div><div class="sv cr" id="hd">—</div></div>
+      <div class="sc"><div class="sl">Leo</div><div class="sv cg" id="hp">—</div></div>
+      <div class="sc"><div class="sl">Wateja</div><div class="sv co" id="hc">—</div></div>
+    </div>
+    <div class="ss">
+      <div class="sc"><div class="sl">Mauzo Leo</div><div class="sv co" id="hs">—</div></div>
+      <div class="sc"><div class="sl">Wana Deni</div><div class="sv cr" id="hu">—</div></div>
+      <div class="sc"><div class="sl">Bidhaa</div><div class="sv cb" id="hpr">—</div></div>
+    </div>
+    <div class="sh"><div class="st">⚡ Madeni Makubwa</div><div class="sa2" onclick="nav('pg-custs')">Wote →</div></div>
+    <div id="hdebt"></div>
+    <div class="sh" style="margin-top:10px"><div class="st">📦 Mauzo ya Hivi Karibuni</div><div class="sa2" onclick="nav('pg-sales')">Yote →</div></div>
+    <div id="hrec"></div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="pg" id="pg-custs">
+    <div class="sh"><div class="st">👥 Wateja</div><div class="sa2" onclick="showMod('mc')">+ Ongeza</div></div>
+    <div class="sw"><span class="si">🔍</span><input type="text" id="csrch" placeholder="Tafuta..." oninput="renderCusts()"></div>
+    <div class="pills">
+      <div class="pill on" onclick="setCF('all',this)">Wote</div>
+      <div class="pill" onclick="setCF('debt',this)">Wana Deni</div>
+      <div class="pill" onclick="setCF('clear',this)">Wasafi</div>
+      <div class="pill" onclick="setCF('loyal',this)">Wasugu</div>
+    </div>
+    <div id="clist"></div>
+  </div>
+
+  <!-- SALES -->
+  <div class="pg" id="pg-sales">
+    <div class="df">
+      <input type="date" id="sfrom" onchange="renderSalesList()">
+      <span>—</span>
+      <input type="date" id="sto" onchange="renderSalesList()">
+    </div>
+    <div class="fc">
+      <div class="ft">➕ Agizo Jipya</div>
+      <div class="fl2"><label>Mteja</label>
+        <select id="scust" style="background:var(--ib)"><option value="">— Chagua Mteja —</option></select>
+        <div style="margin-top:4px;font-size:11px;color:var(--t2)">Mpya? <span style="color:var(--a);cursor:pointer;font-weight:600" onclick="showMod('mc')">+ Sajili</span></div>
+      </div>
+      <div class="fl2"><label>Bidhaa</label><div class="pgrid" id="pgrid"></div></div>
+      <div class="fl2"><label>Malipo ya Awali (Sh)</label><input type="number" id="spay" placeholder="0" min="0" style="background:var(--ib);border:1px solid var(--br);border-radius:8px;padding:9px 12px;color:var(--tx);width:100%;font-family:inherit;font-size:13px;"></div>
+      <div class="fl2"><label>Njia</label>
+        <select id="smeth" style="background:var(--ib)">
+          <option value="mkopo">Mkopo — Atalipa Baadaye</option>
+          <option value="cash">Cash</option>
+          <option value="mpesa">M-Pesa / Tigo Pesa</option>
+        </select>
+      </div>
+      <div class="tbar"><span class="tl">Jumla</span><span class="tv" id="stot">Sh 0</span></div>
+      <button class="fsub" onclick="submitSale()">✅ Hifadhi Mzigo</button>
+    </div>
+    <div class="sh"><div class="st">📋 Rekodi</div></div>
+    <div id="slist"></div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="pg" id="pg-prods">
+    <div class="sh"><div class="st">🛒 Bidhaa</div><div class="sa2" id="addpb" onclick="showMod('mp')">+ Ongeza</div></div>
+    <div id="prlist"></div>
+  </div>
+
+  <!-- REPORTS (admin) -->
+  <div class="pg" id="pg-rep">
+    <div class="sh"><div class="st">📊 Ripoti</div></div>
+    <div class="df">
+      <input type="date" id="rfrom" onchange="renderRep()">
+      <span>—</span>
+      <input type="date" id="rto" onchange="renderRep()">
+    </div>
+    <div id="repout"></div>
+  </div>
+
+  <!-- LOGS (admin) -->
+  <div class="pg" id="pg-logs">
+    <div class="sh"><div class="st">🔍 Activity Logs</div><div class="sa2" onclick="loadLogs()">↻ Refresh</div></div>
+    <div id="logsout"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="pg" id="pg-set">
+    <div class="sh"><div class="st">⚙️ Mipangilio</div></div>
+    <div class="fc" id="usersec">
+      <div class="ft">👤 Watumiaji</div>
+      <div id="ulist"></div>
+      <button class="fsub" onclick="showMod('mu')" style="margin-top:8px">+ Ongeza Mtumiaji</button>
+    </div>
+    <div class="fc">
+      <div class="ft">🔗 Script URL</div>
+      <div class="fl2"><label>URL yako</label><input type="text" id="urlSet" placeholder="https://script.google.com/..."></div>
+      <button class="fsub" onclick="saveUrl()">Hifadhi URL</button>
+    </div>
+    <div class="set">
+      <div><div class="setl">Mwanga / Giza</div><div class="sets">Badilisha mwonekano</div></div>
+      <button class="tog" id="thtog" onclick="toggleTheme()"></button>
+    </div>
+    <div class="set" onclick="exportDB()" style="cursor:pointer">
+      <div><div class="setl">📤 Export Data</div><div class="sets">Pakua JSON backup</div></div>
+      <span style="color:var(--a)">→</span>
+    </div>
+    <div class="set" onclick="clearDB()" style="cursor:pointer">
+      <div><div class="setl" style="color:var(--r)">🗑 Futa Data Yote</div><div class="sets">Haiwezi kubatilishwa</div></div>
+      <span style="color:var(--r)">→</span>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="ni on" onclick="nav('pg-home')"><div class="ic">🏠</div><div class="lb">Nyumbani</div></div>
+    <div class="ni" onclick="nav('pg-custs')"><div class="ic">👥</div><div class="lb">Wateja</div></div>
+    <div class="ni" onclick="nav('pg-sales')"><div class="ic">📦</div><div class="lb">Mauzo</div></div>
+    <div class="ni" onclick="nav('pg-prods')"><div class="ic">🛒</div><div class="lb">Bidhaa</div></div>
+    <div class="ni adm" onclick="nav('pg-rep')"><div class="ic">📊</div><div class="lb">Ripoti</div></div>
+    <div class="ni adm" onclick="nav('pg-logs')"><div class="ic">🔍</div><div class="lb">Logs</div></div>
+    <div class="ni adm" onclick="nav('pg-set')"><div class="ic">⚙️</div><div class="lb">Mipangilio</div></div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Add Customer -->
+<div class="ov" id="mc"><div class="mod">
+  <div class="mt">👤 Sajili Mteja Mpya</div>
+  <div class="fl2"><label>Jina Kamili</label><input type="text" id="cn" placeholder="e.g. Mama Amina"></div>
+  <div class="fl2"><label>Namba ya Simu</label><input type="tel" id="cph" placeholder="+255 7xx xxx xxx"></div>
+  <div class="fl2"><label>Mtaa / Eneo</label><input type="text" id="car" placeholder="e.g. Kariakoo"></div>
+  <div class="mft">
+    <button class="mcan" onclick="hideMod('mc')">Rudi</button>
+    <button class="btn bo" style="flex:1;padding:11px" onclick="saveCust()">Hifadhi</button>
+  </div>
+</div></div>
+
+<!-- Edit Customer -->
+<div class="ov" id="mce"><div class="mod">
+  <div class="mt">✏️ Hariri Mteja</div>
+  <input type="hidden" id="ecid">
+  <div class="fl2"><label>Jina Kamili</label><input type="text" id="ecn"></div>
+  <div class="fl2"><label>Namba ya Simu</label><input type="tel" id="ecph"></div>
+  <div class="fl2"><label>Mtaa / Eneo</label><input type="text" id="ecar"></div>
+  <div class="mft">
+    <button class="mcan" onclick="hideMod('mce')">Rudi</button>
+    <button class="btn bo" style="flex:1;padding:11px" onclick="updateCust()">Hifadhi</button>
+  </div>
+</div></div>
+
+<!-- Customer Profile -->
+<div class="ov" id="mcp"><div class="mod">
+  <div id="cpcon"></div>
+  <div class="mft"><button class="mcan" style="flex:1" onclick="hideMod('mcp')">Funga</button></div>
+</div></div>
+
+<!-- Pay -->
+<div class="ov" id="mpay"><div class="mod">
+  <div class="mt">💰 Pokea Malipo</div>
+  <input type="hidden" id="paycid">
+  <div class="card" style="margin-bottom:10px;padding:11px 13px">
+    <div class="ir"><span class="ik">Mteja</span><span class="iv" id="payn">—</span></div>
+    <div class="ir"><span class="ik">Deni Lote</span><span class="iv" id="payt">—</span></div>
+    <div class="ir"><span class="ik">Amelipa</span><span class="iv" id="payp">—</span></div>
+    <div class="ir"><span class="ik">Kinachobaki</span><span class="iv cr" id="payr">—</span></div>
+  </div>
+  <div class="fl2"><label>Kiasi (Sh)</label><input type="number" id="payamt" placeholder="Weka kiasi..."></div>
+  <div class="fl2"><label>Njia</label><select id="paymeth" style="background:var(--ib)"><option value="cash">Cash</option><option value="mpesa">M-Pesa / Tigo Pesa</option></select></div>
+  <div class="mft">
+    <button class="mcan" onclick="hideMod('mpay')">Rudi</button>
+    <button class="btn bg" style="flex:1;padding:11px" onclick="confirmPay()">✅ Hifadhi</button>
+  </div>
+</div></div>
+
+<!-- Add Product -->
+<div class="ov" id="mp"><div class="mod">
+  <div class="mt">🛒 Bidhaa Mpya</div>
+  <div class="fl2"><label>Jina</label><input type="text" id="apn" placeholder="e.g. Mkate wa Soya"></div>
+  <div class="fl2"><label>Emoji / Icon</label><input type="text" id="api" placeholder="🍞" maxlength="4"></div>
+  <div class="fl2"><label>Bei (Sh)</label><input type="number" id="app" placeholder="600" min="1"></div>
+  <div class="fl2"><label>Kitengo</label><input type="text" id="apu" placeholder="pkt"></div>
+  <div class="mft">
+    <button class="mcan" onclick="hideMod('mp')">Rudi</button>
+    <button class="btn bo" style="flex:1;padding:11px" onclick="saveProd()">Hifadhi</button>
+  </div>
+</div></div>
+
+<!-- Edit Product -->
+<div class="ov" id="mpe"><div class="mod">
+  <div class="mt">✏️ Hariri Bidhaa</div>
+  <input type="hidden" id="epid">
+  <div class="fl2"><label>Jina</label><input type="text" id="epn"></div>
+  <div class="fl2"><label>Emoji / Icon</label><input type="text" id="epi" maxlength="4"></div>
+  <div class="fl2"><label>Bei (Sh)</label><input type="number" id="epp" min="1"></div>
+  <div class="fl2"><label>Kitengo</label><input type="text" id="epu"></div>
+  <div class="mft">
+    <button class="mcan" onclick="hideMod('mpe')">Rudi</button>
+    <button class="btn bo" style="flex:1;padding:11px" onclick="updProd()">Hifadhi</button>
+  </div>
+</div></div>
+
+<!-- Add User -->
+<div class="ov" id="mu"><div class="mod">
+  <div class="mt">👤 Mtumiaji Mpya</div>
+  <div class="fl2"><label>Jina la Mtumiaji</label><input type="text" id="uname" placeholder="e.g. amina"></div>
+  <div class="fl2"><label>Nywila</label><input type="password" id="upass" placeholder="••••••"></div>
+  <div class="fl2"><label>Jukumu</label>
+    <select id="urole" style="background:var(--ib)">
+      <option value="admin">Admin (mamlaka yote)</option>
+      <option value="staff">Mfanyakazi (mauzo tu)</option>
+    </select>
+  </div>
+  <div class="mft">
+    <button class="mcan" onclick="hideMod('mu')">Rudi</button>
+    <button class="btn bo" style="flex:1;padding:11px" onclick="saveUser()">Hifadhi</button>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+<div class="pop" id="pop">
+  <div class="pbox">
+    <div class="pic2" id="pic2">✅</div>
+    <div class="ptl" id="ptl">Imefanikiwa!</div>
+    <div class="psb" id="psb"></div>
+    <button class="pbtn" onclick="hidePop()">Sawa →</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════════
+let API = 'https://script.google.com/macros/s/AKfycbzTSWBqk3YJViBLHA7V2cWgpce0wvitOl5kHJ23h0zyVmJqdS-Zjd1cLe34boSwI25h4Q/exec';
+
+// ════════════════════════════════════════════════════════════
+// LOCAL DB
+// ════════════════════════════════════════════════════════════
+const DFLDB = {
+  users:[{id:'u1',name:'admin',pass:'1234',role:'admin',active:true}],
+  customers:[],
+  products:[
+    {id:'p1',name:'Maandazi',icon:'🥐',price:800,unit:'pkt',active:true},
+    {id:'p2',name:'Toss',icon:'🍞',price:600,unit:'pkt',active:true},
+    {id:'p3',name:'Chocolate Slice',icon:'🍫',price:650,unit:'pkt',active:true},
+    {id:'p4',name:'Banana/Nana Slice',icon:'🍌',price:600,unit:'pkt',active:true},
+    {id:'p5',name:'Mini',icon:'🧁',price:600,unit:'pkt',active:true},
+  ],
+  sales:[],payments:[],
+  pending:{customers:[],sales:[],payments:[],products:[],users:[]},
+};
+
+let DB=JSON.parse(JSON.stringify(DFLDB));
+let ME=null, CF='all', QTY={}, ST=null, BUSY=false;
+
+function loadDB(){
+  try{const s=localStorage.getItem('dl_db');if(s){DB={...DFLDB,...JSON.parse(s)};if(!DB.pending)DB.pending={customers:[],sales:[],payments:[],products:[],users:[]};}}catch(e){}
+}
+function saveDB(){localStorage.setItem('dl_db',JSON.stringify(DB));}
+function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+// ── UTC+3 Date/Time helpers ──────────────────────────────────
+const TZ = 'Africa/Dar_es_Salaam';
+
+function nowISO() {
+  // Current datetime stored as UTC+3 offset string e.g. 2026-03-27T10:30:00.000+03:00
+  const now = new Date();
+  const off = now.getTime() + 3 * 60 * 60 * 1000;
+  return new Date(off).toISOString().replace('Z', '+03:00');
+}
+
+function tod() {
+  // Today YYYY-MM-DD in UTC+3
+  return nowISO().slice(0, 10);
+}
+
+function ftime() {
+  // HH:MM in UTC+3 for sync label
+  return new Date().toLocaleTimeString('sw-TZ', { hour:'2-digit', minute:'2-digit', timeZone: TZ });
+}
+
+function fd(d) {
+  // Format DATE only — handles YYYY-MM-DD strings without timezone shift
+  if (!d) return '—';
+  try {
+    const s = String(d);
+    // If it's a plain date string YYYY-MM-DD, parse directly to avoid UTC midnight shift
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+      const [y, m, day] = s.split('-').map(Number);
+      const months = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ago','Sep','Okt','Nov','Des'];
+      return day + ' ' + months[m-1] + ' ' + y;
+    }
+    // Full ISO timestamp — display date part in UTC+3
+    return new Date(s).toLocaleDateString('sw-TZ', {
+      day:'numeric', month:'short', year:'numeric', timeZone: TZ
+    });
+  } catch(e) { return String(d).slice(0, 10); }
+}
+
+function fdt(ts) {
+  // Format full DATETIME from a timestamp or ISO string — always UTC+3
+  if (!ts) return '—';
+  try {
+    const s = String(ts);
+    // Plain date only — no time to show
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return fd(s);
+    // Numeric timestamp (ms)
+    const dt = /^\d+$/.test(s) ? new Date(Number(s)) : new Date(s);
+    if (isNaN(dt)) return s;
+    return dt.toLocaleString('sw-TZ', {
+      day:'numeric', month:'short', year:'numeric',
+      hour:'2-digit', minute:'2-digit',
+      timeZone: TZ
+    });
+  } catch(e) { return String(ts); }
+}
+function fn(n){return(Number(n)||0).toLocaleString();}
+function isAdm(){return ME?.role==='admin';}
+function dirty(type,rec){
+  if(!DB.pending[type])DB.pending[type]=[];
+  DB.pending[type]=DB.pending[type].filter(r=>r.id!==rec.id);
+  DB.pending[type].push({...rec,updatedAt:nowISO()});
+  saveDB();
+}
+function hasPending(){return Object.values(DB.pending).some(a=>a.length>0);}
+
+// ════════════════════════════════════════════════════════════
+// API CALL
+// ════════════════════════════════════════════════════════════
+async function api(action, data={}) {
+  if(!API) throw new Error('Hakuna Script URL');
+  const url = API+'?action='+encodeURIComponent(action)+'&data='+encodeURIComponent(JSON.stringify(data));
+  const r = await fetch(url,{method:'GET',cache:'no-cache',redirect:'follow'});
+  const txt = await r.text();
+  if(txt.trim().startsWith('<')) throw new Error('GAS ilituma HTML — angalia deployment');
+  const j = JSON.parse(txt);
+  if(j.ok===false) throw new Error(j.error||'GAS error');
+  return j;
+}
+
+// ════════════════════════════════════════════════════════════
+// SYNC
+// ════════════════════════════════════════════════════════════
+function setSS(cls,txt){
+  document.getElementById('sdot').className='sdot '+cls;
+  document.getElementById('stxt').textContent=txt;
+}
+
+async function push(){
+  if(!API||!hasPending()||BUSY)return;
+  try{
+    BUSY=true; setSS('spin','Inatuma...');
+    await api('push',{username:ME?.name,changes:DB.pending});
+    DB.pending={customers:[],sales:[],payments:[],products:[],users:[]};
+    saveDB();
+    setSS('ok','Sync · '+ftime());
+  }catch(e){setSS('err','Push imeshindwa');console.warn(e.message);}
+  finally{BUSY=false;}
+}
+
+async function pull(){
+  if(!API)return;
+  try{
+    setSS('spin','Inapakua...');
+    const r=await api('pull');
+    if(r.customers)merge('customers',r.customers);
+    if(r.sales)merge('sales',r.sales);
+    if(r.payments)merge('payments',r.payments);
+    if(r.products)merge('products',r.products);
+    if(r.users)mergeUsers(r.users);
+    saveDB(); renderAll();
+    setSS('ok','Sync · '+ftime());
+  }catch(e){setSS('err','Pull imeshindwa: '+e.message);console.warn(e.message);}
+}
+
+function merge(key,rows){
+  if(!Array.isArray(rows))return;
+  rows.forEach(r=>{
+    if(!r.id)return;
+    if(r.items&&typeof r.items==='string'){try{r.items=JSON.parse(r.items);}catch(e){r.items=[];}}
+    const i=DB[key].findIndex(x=>x.id===r.id);
+    if(i>=0)DB[key][i]={...DB[key][i],...r};
+    else DB[key].push(r);
+  });
+}
+function mergeUsers(rows){
+  if(!Array.isArray(rows))return;
+  rows.forEach(r=>{
+    if(!r.id)return;
+    const i=DB.users.findIndex(u=>u.id===r.id);
+    if(i>=0)DB.users[i]={...DB.users[i],name:r.name,role:r.role,active:r.active};
+    else DB.users.push({id:r.id,name:r.name,role:r.role,active:r.active,pass:''});
+  });
+}
+
+async function manualSync(){if(BUSY)return;await push();await pull();if(isAdm())loadLogs();}
+
+function startSync(){
+  if(ST)clearInterval(ST);
+  ST=setInterval(()=>{if(!BUSY&&hasPending())push();},2*60*1000);
+  setInterval(()=>{if(!BUSY)pull();},5*60*1000);
+}
+
+function logAct(action,detail){
+  if(API&&ME)api('log',{username:ME.name,action,detail}).catch(()=>{});
+}
+
+// ════════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════════
+async function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+
+  if(!u||!p){toast('⚠️ Jaza jina na nywila','err');return;}
+  const btn=document.getElementById('loginBtn');
+  btn.classList.add('ldg');btn.textContent='Inaingia...';
+
+  if(API){
+    try{
+      const r=await api('login',{username:u,password:p});
+      btn.classList.remove('ldg');btn.textContent='Ingia →';
+      ME={name:r.username,role:r.role};
+      enterApp(); pull(); return;
+    }catch(e){
+      btn.classList.remove('ldg');btn.textContent='Ingia →';
+      toast('❌ '+e.message,'err');
+      setSS('err',e.message); return;
+    }
+  }
+  // Offline
+  const user=DB.users.find(x=>x.name===u&&x.pass===p&&x.active!==false);
+  btn.classList.remove('ldg');btn.textContent='Ingia →';
+  if(!user){toast('❌ Jina au nywila si sahihi','err');return;}
+  ME={name:user.name,role:user.role};
+  setSS('','Offline mode');
+  enterApp();
+}
+
+function enterApp(){
+  document.getElementById('LS').style.display='none';
+  const app=document.getElementById('AS');
+  app.style.display='flex';app.style.flexDirection='column';
+  document.getElementById('ub').textContent=(isAdm()?'🔑':'👤')+' '+ME.name;
+  // Role restrictions
+  document.querySelectorAll('.adm').forEach(e=>e.classList.toggle('hide',!isAdm()));
+  document.getElementById('usersec').style.display=isAdm()?'':'none';
+  document.getElementById('addpb').style.display=isAdm()?'':'none';
+  document.getElementById('urlSet').value=API;
+  if(API)setSS('ok','Imeunganishwa');
+  renderAll(); startSync();
+}
+
+function logout(){
+  if(!confirm('Toka?'))return;
+  if(API&&hasPending())push();
+  ME=null;
+  if(ST){clearInterval(ST);ST=null;}
+  document.getElementById('AS').style.display='none';
+  document.getElementById('LS').style.cssText='display:flex';
+  document.getElementById('lu').value='';document.getElementById('lp').value='';
+  setSS('','—');
+}
+
+// ════════════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════════════
+function nav(id){
+  if((id==='pg-rep'||id==='pg-logs')&&!isAdm()){toast('⛔ Admin tu','err');return;}
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')?.includes(id))n.classList.add('on');});
+  if(id==='pg-home')renderHome();
+  if(id==='pg-custs')renderCusts();
+  if(id==='pg-sales'){buildPGrid();fillCustDD();renderSalesList();}
+  if(id==='pg-prods')renderProds();
+  if(id==='pg-rep')renderRep();
+  if(id==='pg-logs')loadLogs();
+  if(id==='pg-set')renderSet();
+}
+
+function renderAll(){renderHome();renderCusts();fillCustDD();buildPGrid();renderSalesList();renderProds();if(isAdm())renderRep();renderSet();}
+
+// ════════════════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════════════════
+function renderHome(){
+  const td=DB.customers.reduce((s,c)=>s+(Number(c.balance)||0),0);
+  const tp=DB.payments.filter(p=>p.date===tod()).reduce((s,p)=>s+(Number(p.amount)||0),0);
+  const ts=DB.sales.filter(s=>s.date===tod()).reduce((s,x)=>s+(Number(x.total)||0),0);
+  const uc=DB.customers.filter(c=>(Number(c.balance)||0)>0).length;
+  document.getElementById('hd').textContent='Sh '+fn(td);
+  document.getElementById('hp').textContent='Sh '+fn(tp);
+  document.getElementById('hc').textContent=DB.customers.length;
+  document.getElementById('hs').textContent='Sh '+fn(ts);
+  document.getElementById('hu').textContent=uc;
+  document.getElementById('hpr').textContent=DB.products.filter(p=>p.active).length;
+
+  const debtors=DB.customers.filter(c=>(Number(c.balance)||0)>0).sort((a,b)=>b.balance-a.balance).slice(0,5);
+  document.getElementById('hdebt').innerHTML=debtors.length
+    ?debtors.map(c=>`<div class="card"><div class="crow" onclick="openProfile('${c.id}')"><div><div class="cn">${c.name}</div><div class="cs">${c.phone||'—'}</div></div><div class="bdg br2">Sh ${fn(c.balance)}</div></div></div>`).join('')
+    :'<div class="empty"><div class="ei">🎉</div><p>Hakuna madeni!</p></div>';
+
+  const rec=[...DB.sales].sort((a,b)=>b.createdAt-a.createdAt).slice(0,5);
+  document.getElementById('hrec').innerHTML=rec.length
+    ?rec.map(s=>{const c=DB.customers.find(x=>x.id===s.custId);return`<div class="card"><div class="crow"><div><div class="cn">${c?c.name:'—'}</div><div class="cs">${fd(s.date)} · ${s.staffName||''}</div></div><div class="bdg bo2">Sh ${fn(s.total)}</div></div></div>`;}).join('')
+    :'<div class="empty"><div class="ei">📋</div><p>Hakuna mauzo bado</p></div>';
+}
+
+// ════════════════════════════════════════════════════════════
+// CUSTOMERS
+// ════════════════════════════════════════════════════════════
+function setCF(f,el){CF=f;document.querySelectorAll('#pg-custs .pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');renderCusts();}
+
+function renderCusts(){
+  const q=(document.getElementById('csrch').value||'').toLowerCase();
+  let list=DB.customers.filter(c=>c.name.toLowerCase().includes(q)||(c.phone||'').includes(q));
+  if(CF==='debt')list=list.filter(c=>(Number(c.balance)||0)>0);
+  if(CF==='clear')list=list.filter(c=>(Number(c.balance)||0)<=0);
+  if(CF==='loyal')list=list.filter(c=>DB.sales.filter(s=>s.custId===c.id).length>=5);
+  const el=document.getElementById('clist');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">👥</div><p>Hakuna wateja</p></div>';return;}
+  el.innerHTML=list.map(c=>{
+    const debt=(Number(c.balance)||0)>0;
+    const oc=DB.sales.filter(s=>s.custId===c.id).length;
+    return`<div class="card">
+      <div class="crow" onclick="tog('cc${c.id}')"><div><div class="cn">${c.name}</div><div class="cs">${c.phone||'—'} · ${oc} orders</div></div><div class="bdg ${debt?'br2':'bg2'}">${debt?'Sh '+fn(c.balance):'✓ Safi'}</div></div>
+      <div class="cbody" id="cc${c.id}">
+        <div class="ir"><span class="ik">Eneo</span><span class="iv">${c.area||'—'}</span></div>
+        <div class="ir"><span class="ik">Jumla Mauzo</span><span class="iv">Sh ${fn(DB.sales.filter(s=>s.custId===c.id).reduce((a,x)=>a+(Number(x.total)||0),0))}</span></div>
+        <div class="ar">
+          ${debt?`<button class="btn bg" onclick="openPay('${c.id}')">💰 Lipa</button>`:''}
+          <button class="btn bgh" onclick="openProfile('${c.id}')">📋 Profile</button>
+          ${c.phone?`<button class="btn bwa" onclick="sendWA('${c.id}')">📲 WA</button>`:''} 
+          ${c.phone?`<button class="btn bsms" onclick="sendSMS('${c.id}')">💬 SMS</button>`:''}
+          <button class="btn bgh" onclick="editCust('${c.id}')">✏️</button>
+          ${isAdm()?`<button class="btn br3" onclick="delCust('${c.id}')">🗑</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tog(id){document.getElementById(id)?.classList.toggle('on');}
+
+function saveCust(){
+  const name=document.getElementById('cn').value.trim();
+  if(!name){toast('⚠️ Weka jina','err');return;}
+  const rec={id:gid(),name,phone:document.getElementById('cph').value.trim(),area:document.getElementById('car').value.trim(),balance:0,createdAt:nowISO()};
+  DB.customers.push(rec); dirty('customers',rec);
+  hideMod('mc');['cn','cph','car'].forEach(i=>document.getElementById(i).value='');
+  renderCusts();fillCustDD();renderHome();
+  pop('👤','Mteja Amesajiliwa!',rec.name+' ameongezwa.');
+  logAct('NEW_CUST',rec.name); push();
+}
+
+function editCust(id){
+  const c=DB.customers.find(x=>x.id===id);
+  document.getElementById('ecid').value=id;
+  document.getElementById('ecn').value=c.name;
+  document.getElementById('ecph').value=c.phone||'';
+  document.getElementById('ecar').value=c.area||'';
+  showMod('mce');
+}
+function updateCust(){
+  const id=document.getElementById('ecid').value;
+  const c=DB.customers.find(x=>x.id===id);
+  c.name=document.getElementById('ecn').value.trim();
+  c.phone=document.getElementById('ecph').value.trim();
+  c.area=document.getElementById('ecar').value.trim();
+  dirty('customers',c); hideMod('mce'); renderCusts(); fillCustDD();
+  pop('✏️','Mteja Amesasishwa!',c.name); logAct('EDIT_CUST',c.name); push();
+}
+function delCust(id){
+  if(!isAdm()){toast('⛔ Admin tu','err');return;}
+  if(!confirm('Futa mteja huyu?'))return;
+  const c=DB.customers.find(x=>x.id===id);
+  DB.customers=DB.customers.filter(x=>x.id!==id);
+  saveDB(); renderCusts(); renderHome();
+  logAct('DEL_CUST',(c?.name||id)); push();
+  toast('🗑 Mteja amefutwa');
+}
+
+function fillCustDD(){
+  const sel=document.getElementById('scust');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— Chagua Mteja —</option>'+
+    DB.customers.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${c.id}"${c.id===cur?' selected':''}>${c.name}${c.phone?' · '+c.phone:''}</option>`).join('');
+}
+
+// ── Customer Profile ──────────────────────────────────────────
+function openProfile(id){
+  const c=DB.customers.find(x=>x.id===id);
+  if(!c)return;
+  const orders=DB.sales.filter(s=>s.custId===id).sort((a,b)=>b.createdAt-a.createdAt);
+  const pays=DB.payments.filter(p=>p.custId===id).sort((a,b)=>b.createdAt-a.createdAt);
+  const tot=orders.reduce((s,o)=>s+(Number(o.total)||0),0);
+  const tpd=pays.reduce((s,p)=>s+(Number(p.amount)||0),0);
+  let tl=[
+    ...orders.map(o=>({type:'ord',date:o.date,ts:Number(o.createdAt)||0,amt:Number(o.total)||0,
+      det:Array.isArray(o.items)?o.items.map(i=>{const p=DB.products.find(x=>x.id===i.pid);return(p?p.icon:'?')+' '+(p?p.name:'?')+' ×'+i.qty;}).join(', '):'',
+      staff:o.staffName,ip:Number(o.initPay)||0})),
+    ...pays.map(p=>({type:'pay',date:p.date,ts:Number(p.createdAt)||0,amt:Number(p.amount)||0,
+      det:'Njia: '+(p.method==='mpesa'?'M-Pesa/Tigo':'Cash'),staff:p.staffName}))
+  ].sort((a,b)=>b.ts-a.ts);
+  // Debt cleared date
+  let rd=0,clr=null;
+  [...tl].reverse().forEach(t=>{
+    if(t.type==='ord')rd+=t.amt-(t.ip||0);
+    if(t.type==='pay'){rd-=t.amt;if(rd<=0&&t.amt>0)clr=t.date;}
+  });
+  const debt=Number(c.balance)||0;
+  document.getElementById('cpcon').innerHTML=`
+    <div class="ph">
+      <div class="pav">${c.name[0].toUpperCase()}</div>
+      <div class="pname">${c.name}</div>
+      <div class="pph">${c.phone||'Simu haijawekwa'} · ${c.area||'—'}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+        <div style="background:var(--c2);border-radius:8px;padding:9px;text-align:center"><div style="font-size:9px;color:var(--t2);text-transform:uppercase">Orders</div><div style="font-family:Syne,sans-serif;font-weight:800;font-size:18px">${orders.length}</div></div>
+        <div style="background:var(--c2);border-radius:8px;padding:9px;text-align:center"><div style="font-size:9px;color:var(--t2);text-transform:uppercase">Umenunua</div><div style="font-family:Syne,sans-serif;font-weight:800;font-size:14px">Sh ${fn(tot)}</div></div>
+        <div style="background:${debt>0?'rgba(240,68,68,.1)':'rgba(62,207,142,.1)'};border-radius:8px;padding:9px;text-align:center"><div style="font-size:9px;color:${debt>0?'var(--r)':'var(--g)'};text-transform:uppercase">Deni</div><div style="font-family:Syne,sans-serif;font-weight:800;font-size:14px;color:${debt>0?'var(--r)':'var(--g)'}"><div>${debt>0?'Sh '+fn(debt):'✓ Safi'}</div></div></div>
+      </div>
+      ${clr?`<div style="margin-top:8px;background:rgba(62,207,142,.1);border-radius:8px;padding:7px;font-size:11px;color:var(--g);text-align:center">✅ Deni lilikamilika: <strong>${fd(clr)}</strong></div>`:''}
+    </div>
+    <div class="sh"><div class="st">📋 Historia (${tl.length})</div></div>
+    <div class="tl2">${tl.length?tl.slice(0,30).map(t=>`
+      <div class="ti">
+        <div class="td ${t.type==='ord'?'ord':'pay'}"></div>
+        <div class="tinfo">
+          <div class="ttl">${t.type==='ord'?'📦 Mzigo Uliotolewa':'💰 Malipo Yalipokewa'}</div>
+          <div class="tmeta" style="color:var(--a);font-weight:600">📅 ${t.ts ? fdt(t.ts) : fd(t.date)}${t.staff?' · 👤 '+t.staff:''}</div>
+          <div class="tmeta">${t.det}</div>
+          ${t.type==='ord'&&t.ip>0?`<div class="tmeta" style="color:var(--g)">Alilipa awali: Sh ${fn(t.ip)}</div>`:''}
+        </div>
+        <div class="tam" style="color:${t.type==='ord'?'var(--r)':'var(--g)'}">${t.type==='ord'?'−':'+'}Sh ${fn(t.amt)}</div>
+      </div>`).join(''):'<div class="empty"><p>Hakuna historia</p></div>'}</div>`;
+  showMod('mcp');
+}
+
+// ── Payments ──────────────────────────────────────────────────
+function openPay(cid){
+  const c=DB.customers.find(x=>x.id===cid);
+  document.getElementById('paycid').value=cid;
+  document.getElementById('payn').textContent=c.name;
+  const ts=DB.sales.filter(s=>s.custId===cid).reduce((a,x)=>a+(Number(x.total)||0),0);
+  const tp=DB.payments.filter(p=>p.custId===cid).reduce((a,x)=>a+(Number(x.amount)||0),0);
+  document.getElementById('payt').textContent='Sh '+fn(ts);
+  document.getElementById('payp').textContent='Sh '+fn(tp);
+  document.getElementById('payr').textContent='Sh '+fn(Number(c.balance)||0);
+  document.getElementById('payamt').value='';
+  showMod('mpay');
+}
+function confirmPay(){
+  const cid=document.getElementById('paycid').value;
+  const amt=parseInt(document.getElementById('payamt').value);
+  const meth=document.getElementById('paymeth').value;
+  const c=DB.customers.find(x=>x.id===cid);
+  if(!amt||amt<=0){toast('⚠️ Weka kiasi','err');return;}
+  if(amt>(Number(c.balance)||0)){toast('⚠️ Kiasi ni kikubwa kuliko deni','err');return;}
+  c.balance=(Number(c.balance)||0)-amt;
+  const rec={id:gid(),custId:cid,amount:amt,method:meth,date:tod(),createdAt:Date.now(),staffName:ME?.name};
+  DB.payments.push(rec); dirty('payments',rec); dirty('customers',c);
+  hideMod('mpay'); renderCusts(); renderHome();
+  pop('💰','Malipo Yamepokewa!','Sh '+fn(amt)+' kutoka '+c.name);
+  logAct('PAYMENT','Sh '+amt+' · '+c.name+' · '+meth); push();
+}
+
+// ── WA / SMS ──────────────────────────────────────────────────
+function buildMsg(cid){
+  const c=DB.customers.find(x=>x.id===cid);
+  const csal=DB.sales.filter(s=>s.custId===cid).sort((a,b)=>a.createdAt-b.createdAt);
+  const cpay=DB.payments.filter(p=>p.custId===cid);
+  const tp=cpay.reduce((a,p)=>a+(Number(p.amount)||0),0);
+  const to2=csal.reduce((a,s)=>a+(Number(s.total)||0),0);
+  const lp=cpay.sort((a,b)=>b.createdAt-a.createdAt)[0];
+  let rec='';
+  csal.slice(-3).forEach(s=>{
+    const items=Array.isArray(s.items)?s.items:[];
+    rec+=`📅 Tarehe: ${fd(s.date)}\n`+items.map(i=>{const p=DB.products.find(x=>x.id===i.pid);return`  ${p?p.icon:''} ${p?p.name:'?'} ×${i.qty} — Sh ${fn(i.qty*(p?p.price:0))}`;}).join('\n')+`\n  Jumla: Sh ${fn(s.total)}\n\n`;
+  });
+  const rem=Number(c.balance)||0;
+  return`Habari ${c.name}! 🙏\n\n━━━━━━━━━━━━━\n🧾 RISITI — DukaLangu\n━━━━━━━━━━━━━\n\n${rec}💰 Jumla Yote: Sh ${fn(to2)}\n✅ Umelipa: Sh ${fn(tp)}\n${rem<=0?'✅ Deni limekamilika'+(lp?' tarehe '+fd(lp.date):'')+'!':'⏳ Kinachobaki: *Sh '+fn(rem)+'*'+(lp?'\n📅 Malipo ya mwisho: '+fd(lp.date):'')}\n\nAsante! 🛍️`;
+}
+function sendWA(cid){const c=DB.customers.find(x=>x.id===cid);const ph=(c.phone||'').replace(/\s+/g,'').replace(/^\+/,'');window.open(ph?`https://wa.me/${ph}?text=${encodeURIComponent(buildMsg(cid))}`:`https://wa.me/?text=${encodeURIComponent(buildMsg(cid))}`,'_blank');logAct('WA',c.name);}
+function sendSMS(cid){const c=DB.customers.find(x=>x.id===cid);const ph=(c.phone||'').replace(/\s+/g,'');window.open(`sms:${ph}?body=${encodeURIComponent(buildMsg(cid))}`);logAct('SMS',c.name);}
+
+// ════════════════════════════════════════════════════════════
+// SALES
+// ════════════════════════════════════════════════════════════
+function buildPGrid(){
+  fillCustDD();
+  const grid=document.getElementById('pgrid');
+  QTY={};
+  DB.products.filter(p=>p.active).forEach(p=>{QTY[p.id]=0;});
+  grid.innerHTML=DB.products.filter(p=>p.active).map(p=>`
+    <div class="pt">
+      <div class="ptop"><span class="pic">${p.icon}</span><div><div class="pn">${p.name}</div><div class="pp">Sh ${fn(p.price)}/${p.unit}</div></div></div>
+      <div class="qc">
+        <button class="qb" onclick="aq('${p.id}',-1)">−</button>
+        <input class="qi" type="number" id="q${p.id}" value="0" min="0" oninput="sq('${p.id}',this.value)">
+        <button class="qb" onclick="aq('${p.id}',1)">+</button>
+      </div>
+    </div>`).join('');
+  updTot();
+}
+function aq(pid,d){QTY[pid]=Math.max(0,(QTY[pid]||0)+d);const el=document.getElementById('q'+pid);if(el)el.value=QTY[pid];updTot();}
+function sq(pid,v){QTY[pid]=Math.max(0,parseInt(v)||0);updTot();}
+function updTot(){let t=0;Object.entries(QTY).forEach(([pid,qty])=>{const p=DB.products.find(x=>x.id===pid);if(p)t+=qty*p.price;});document.getElementById('stot').textContent='Sh '+fn(t);}
+
+function submitSale(){
+  const cid=document.getElementById('scust').value;
+  if(!cid){toast('⚠️ Chagua mteja','err');return;}
+  DB.products.filter(p=>p.active).forEach(p=>{const el=document.getElementById('q'+p.id);if(el)QTY[p.id]=Math.max(0,parseInt(el.value)||0);});
+  const items=Object.entries(QTY).filter(([,q])=>q>0).map(([pid,qty])=>{const p=DB.products.find(x=>x.id===pid);return{pid,qty,price:p.price};});
+  if(!items.length){toast('⚠️ Chagua bidhaa','err');return;}
+  const total=items.reduce((s,i)=>s+i.qty*i.price,0);
+  const ip=Math.min(parseInt(document.getElementById('spay').value)||0,total);
+  const meth=document.getElementById('smeth').value;
+  const c=DB.customers.find(x=>x.id===cid);
+  c.balance=(Number(c.balance)||0)+(total-ip);
+  const sr={id:gid(),custId:c.id,items,total,initPay:ip,method:meth,date:tod(),createdAt:Date.now(),staffName:ME?.name};
+  DB.sales.push(sr); dirty('sales',sr); dirty('customers',c);
+  if(ip>0){const pr={id:gid(),custId:c.id,amount:ip,method:meth,date:tod(),createdAt:Date.now(),staffName:ME?.name,saleId:sr.id};DB.payments.push(pr);dirty('payments',pr);}
+  saveDB(); buildPGrid(); renderSalesList(); renderHome(); renderCusts();
+  document.getElementById('spay').value='';
+  pop('📦','Mzigo Umehifadhiwa!',c.name+' · Sh '+fn(total));
+  logAct('SALE',c.name+' · Sh '+total); push();
+}
+
+function renderSalesList(){
+  const from=document.getElementById('sfrom').value;
+  const to=document.getElementById('sto').value;
+  let list=[...DB.sales].sort((a,b)=>b.createdAt-a.createdAt);
+  if(from)list=list.filter(s=>s.date>=from);
+  if(to)list=list.filter(s=>s.date<=to);
+  const el=document.getElementById('slist');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><p>Hakuna mauzo</p></div>';return;}
+  el.innerHTML=list.slice(0,50).map(s=>{
+    const c=DB.customers.find(x=>x.id===s.custId);
+    const items=Array.isArray(s.items)?s.items:[];
+    const sm=items.map(i=>{const p=DB.products.find(x=>x.id===i.pid);return(p?p.icon:'?')+'×'+i.qty;}).join(' ');
+    return`<div class="card"><div class="crow"><div><div class="cn">${c?c.name:'—'}</div><div class="cs">${fd(s.date)} · ${sm} · ${s.staffName||''}</div></div><div><div class="bdg bo2">Sh ${fn(s.total)}</div>${(Number(s.initPay)||0)>0?`<div class="bdg bg2" style="font-size:10px;margin-top:3px">Alipa Sh ${fn(s.initPay)}</div>`:''}</div></div></div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// PRODUCTS
+// ════════════════════════════════════════════════════════════
+function renderProds(){
+  const el=document.getElementById('prlist');
+  if(!DB.products.length){el.innerHTML='<div class="empty"><div class="ei">🛒</div><p>Hakuna bidhaa</p></div>';return;}
+  el.innerHTML=DB.products.map(p=>`
+    <div class="card"><div class="crow">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-size:26px">${p.icon}</span><div><div class="cn">${p.name}</div><div class="cs">Sh ${fn(p.price)} / ${p.unit}</div></div></div>
+      <div class="ar" style="margin:0">
+        ${isAdm()?`<button class="btn bgh" onclick="editProd('${p.id}')">✏️</button><button class="btn br3" onclick="delProd('${p.id}')">🗑</button>`:'<span style="font-size:10px;color:var(--t3)">Read only</span>'}
+      </div>
+    </div></div>`).join('');
+}
+function saveProd(){
+  if(!isAdm()){toast('⛔ Admin tu','err');return;}
+  const name=document.getElementById('apn').value.trim();
+  const icon=document.getElementById('api').value.trim()||'📦';
+  const price=parseInt(document.getElementById('app').value);
+  const unit=document.getElementById('apu').value.trim()||'pkt';
+  if(!name||!price){toast('⚠️ Jaza sehemu zote','err');return;}
+  const rec={id:gid(),name,icon,price,unit,active:true,createdAt:nowISO()};
+  DB.products.push(rec); dirty('products',rec);
+  hideMod('mp');['apn','api','app','apu'].forEach(i=>document.getElementById(i).value='');
+  renderProds(); buildPGrid();
+  pop('🛒','Bidhaa Imeongezwa!',name+' · Sh '+fn(price));
+  logAct('NEW_PROD',name); push();
+}
+function editProd(id){
+  const p=DB.products.find(x=>x.id===id);
+  document.getElementById('epid').value=id;
+  document.getElementById('epn').value=p.name;
+  document.getElementById('epi').value=p.icon;
+  document.getElementById('epp').value=p.price;
+  document.getElementById('epu').value=p.unit;
+  showMod('mpe');
+}
+function updProd(){
+  if(!isAdm()){toast('⛔ Admin tu','err');return;}
+  const id=document.getElementById('epid').value;
+  const p=DB.products.find(x=>x.id===id);
+  p.name=document.getElementById('epn').value.trim();
+  p.icon=document.getElementById('epi').value.trim()||'📦';
+  p.price=parseInt(document.getElementById('epp').value);
+  p.unit=document.getElementById('epu').value.trim()||'pkt';
+  dirty('products',p); hideMod('mpe'); renderProds(); buildPGrid();
+  pop('✏️','Bidhaa Imesasishwa!',p.name); logAct('EDIT_PROD',p.name); push();
+}
+function delProd(id){
+  if(!isAdm()){toast('⛔ Admin tu','err');return;}
+  if(!confirm('Futa bidhaa?'))return;
+  const p=DB.products.find(x=>x.id===id);
+  DB.products=DB.products.filter(x=>x.id!==id);
+  saveDB(); renderProds(); buildPGrid(); toast('🗑 Bidhaa imefutwa');
+  logAct('DEL_PROD',(p?.name||id)); push();
+}
+
+// ════════════════════════════════════════════════════════════
+// REPORTS
+// ════════════════════════════════════════════════════════════
+function renderRep(){
+  if(!isAdm())return;
+  const from=document.getElementById('rfrom').value||'2020-01-01';
+  const to=document.getElementById('rto').value||tod();
+  const sales=DB.sales.filter(s=>s.date>=from&&s.date<=to);
+  const pays=DB.payments.filter(p=>p.date>=from&&p.date<=to);
+  const tS=sales.reduce((a,s)=>a+(Number(s.total)||0),0);
+  const tP=pays.reduce((a,p)=>a+(Number(p.amount)||0),0);
+  const tD=DB.customers.reduce((a,c)=>a+(Number(c.balance)||0),0);
+  // Product stats
+  const ps={};DB.products.forEach(p=>{ps[p.id]={name:p.name,icon:p.icon,qty:0,rev:0};});
+  sales.forEach(s=>{(Array.isArray(s.items)?s.items:[]).forEach(i=>{if(ps[i.pid]){ps[i.pid].qty+=Number(i.qty)||0;ps[i.pid].rev+=(Number(i.qty)||0)*(Number(i.price)||0);}});});
+  const tp2=Object.values(ps).sort((a,b)=>b.rev-a.rev);
+  const maxR=tp2[0]?.rev||1;
+  // Staff
+  const stf={};sales.forEach(s=>{const n=s.staffName||'Haijulikani';if(!stf[n])stf[n]={s:0,r:0};stf[n].s++;stf[n].r+=Number(s.total)||0;});
+  // Top customers
+  const csm={};sales.forEach(s=>{if(!csm[s.custId])csm[s.custId]=0;csm[s.custId]+=Number(s.total)||0;});
+  const tc=Object.entries(csm).map(([id,t])=>({c:DB.customers.find(x=>x.id===id),t})).filter(x=>x.c).sort((a,b)=>b.t-a.t).slice(0,5);
+  const loyal=DB.customers.map(c=>({...c,oc:DB.sales.filter(s=>s.custId===c.id).length})).filter(c=>c.oc>=5).sort((a,b)=>b.oc-a.oc);
+
+  document.getElementById('repout').innerHTML=`
+    <div class="rc"><div class="rt">📊 Muhtasari · ${fd(from)} — ${fd(to)}</div>
+      <div class="sg">
+        <div class="si2"><div class="sl2">Mauzo Yote</div><div class="sv2 co">Sh ${fn(tS)}</div></div>
+        <div class="si2"><div class="sl2">Malipo Yote</div><div class="sv2 cg">Sh ${fn(tP)}</div></div>
+        <div class="si2"><div class="sl2">Madeni Yote</div><div class="sv2 cr">Sh ${fn(tD)}</div></div>
+        <div class="si2"><div class="sl2">Idadi Mauzo</div><div class="sv2">${sales.length}</div></div>
+      </div>
+    </div>
+    <div class="rc"><div class="rt">🛒 Bidhaa Zinazoongoza</div>
+      ${tp2.map((p,i)=>`<div class="bar"><div class="blbl">${p.icon} ${p.name}</div><div class="btr"><div class="bfill" style="width:${Math.round(p.rev/maxR*100)}%">Sh ${fn(p.rev)}</div></div></div>`).join('')}
+    </div>
+    <div class="rc"><div class="rt">👤 Mauzo kwa Mfanyakazi</div><div class="tlist">
+      ${Object.entries(stf).sort((a,b)=>b[1].r-a[1].r).map(([n,d],i)=>`<div class="ti2"><div style="display:flex;align-items:center;gap:8px"><div class="rbdg">${i+1}</div><div><div style="font-weight:600">${n}</div><div style="font-size:10px;color:var(--t2)">${d.s} mauzo</div></div></div><span style="font-weight:600;color:var(--a)">Sh ${fn(d.r)}</span></div>`).join('')||'<div style="color:var(--t3);font-size:12px;text-align:center;padding:10px">Hakuna data</div>'}
+    </div></div>
+    <div class="rc"><div class="rt">🏆 Wateja Wakubwa</div><div class="tlist">
+      ${tc.length?tc.map((x,i)=>`<div class="ti2"><div style="display:flex;align-items:center;gap:8px"><div class="rbdg">${i+1}</div><div><div style="font-weight:600">${x.c.name}</div><div style="font-size:10px;color:var(--t2)">${x.c.phone||'—'}</div></div></div><span style="font-weight:600;color:var(--a)">Sh ${fn(x.t)}</span></div>`).join(''):'<div style="color:var(--t3);font-size:12px;text-align:center;padding:10px">Hakuna data</div>'}
+    </div></div>
+    <div class="rc"><div class="rt">⭐ Wateja Sugu (5+ Orders)</div><div class="tlist">
+      ${loyal.length?loyal.map((c,i)=>`<div class="ti2"><div style="display:flex;align-items:center;gap:8px"><div class="rbdg">${i+1}</div><div><div style="font-weight:600">${c.name}</div><div style="font-size:10px;color:var(--t2)">${c.phone||'—'}</div></div></div><div style="text-align:right"><div style="font-weight:600">${c.oc} orders</div><div style="font-size:10px;color:${(Number(c.balance)||0)>0?'var(--r)':'var(--g)'}">Deni: Sh ${fn(c.balance||0)}</div></div></div>`).join(''):'<div style="color:var(--t3);font-size:12px;text-align:center;padding:10px">Bado hakuna (5+)</div>'}
+    </div></div>
+    <div class="rc"><div class="rt">📋 Wateja Wote (${DB.customers.length})</div><div class="tlist">
+      ${[...DB.customers].sort((a,b)=>(Number(b.balance)||0)-(Number(a.balance)||0)).map(c=>`<div class="ti2"><div><div style="font-weight:600">${c.name}</div><div style="font-size:10px;color:var(--t2)">${c.phone||'—'}</div></div><div class="bdg ${(Number(c.balance)||0)>0?'br2':'bg2'}">${(Number(c.balance)||0)>0?'Sh '+fn(c.balance):'Safi'}</div></div>`).join('')}
+    </div></div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// LOGS
+// ════════════════════════════════════════════════════════════
+async function loadLogs(){
+  if(!isAdm())return;
+  const el=document.getElementById('logsout');
+  el.innerHTML='<div class="empty"><div class="ei">⏳</div><p>Inapakua...</p></div>';
+  if(!API){el.innerHTML='<div class="empty"><div class="ei">🔗</div><p>Weka Script URL</p></div>';return;}
+  try{
+    const r=await api('getLogs');
+    if(!r.logs?.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><p>Hakuna logs</p></div>';return;}
+    const icons={LOGIN:'🔑',LOGOUT:'🚪',SALE:'📦',PAYMENT:'💰',NEW_CUST:'👤',EDIT_CUST:'✏️',DEL_CUST:'🗑',NEW_PROD:'🛒',PUSH:'☁️',WA:'📲',SMS:'💬'};
+    el.innerHTML='<div class="card" style="padding:10px 14px">'+r.logs.map(l=>`
+      <div class="li">
+        <span style="font-size:16px">${icons[l.action]||'📌'}</span>
+        <div style="flex:1">
+          <div style="display:flex;gap:6px;align-items:center"><span class="la">${l.action}</span><span class="bdg bb2" style="font-size:9px">${l.user||l.username||'—'}</span></div>
+          <div class="ld">${l.detail||'—'}</div>
+          <div class="lt">${fdt(l.time||l.ts)}</div>
+        </div>
+      </div>`).join('')+'</div>';
+  }catch(e){el.innerHTML='<div class="empty"><div class="ei">❌</div><p>'+e.message+'</p></div>';}
+}
+
+// ════════════════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════════════════
+function renderSet(){
+  const ul=document.getElementById('ulist');
+  if(ul&&isAdm())ul.innerHTML=DB.users.map(u=>`
+    <div class="ir"><span class="ik">👤 ${u.name} <span style="background:${u.role==='admin'?'var(--a)':'var(--b)'};color:#000;padding:2px 6px;border-radius:4px;font-size:9px;font-family:Syne,sans-serif;font-weight:700;margin-left:4px">${u.role}</span></span>
+    ${u.id!=='u1'?`<span style="color:var(--r);cursor:pointer;font-size:12px" onclick="delUser('${u.id}')">Futa</span>`:'<span style="color:var(--t3);font-size:11px">Root</span>'}</div>`).join('');
+}
+function saveUser(){
+  if(!isAdm()){toast('⛔ Admin tu','err');return;}
+  const name=document.getElementById('uname').value.trim();
+  const pass=document.getElementById('upass').value;
+  const role=document.getElementById('urole').value;
+  if(!name||!pass){toast('⚠️ Jaza sehemu zote','err');return;}
+  if(DB.users.find(u=>u.name===name)){toast('⚠️ Jina limetumika','err');return;}
+  const rec={id:gid(),name,password:pass,pass,role,active:'true',createdAt:nowISO()};
+  DB.users.push({...rec,pass});
+  dirty('users',rec); saveDB(); hideMod('mu');
+  document.getElementById('uname').value='';document.getElementById('upass').value='';
+  renderSet();
+  pop('👤','Mtumiaji Ameongezwa!',name+' ('+role+')');
+  logAct('NEW_USER',name+' · '+role); push();
+}
+function delUser(id){
+  if(!confirm('Futa mtumiaji?'))return;
+  const u=DB.users.find(x=>x.id===id);
+  DB.users=DB.users.filter(x=>x.id!==id);
+  saveDB(); renderSet(); toast('🗑 Mtumiaji amefutwa');
+  logAct('DEL_USER',(u?.name||id));
+}
+function saveUrl(){
+  const url=document.getElementById('urlSet').value.trim();
+  API=url; localStorage.setItem('dl_url',url);
+  pop('🔗','URL Imehifadhiwa!',url?'Sync imeanzishwa':'URL imefutwa');
+}
+function toggleTheme(){
+  const d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  document.getElementById('thtog').classList.toggle('on',!d);
+  document.getElementById('thbtn').textContent=d?'🌙':'☀️';
+}
+function exportDB(){
+  const b=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dukalangu_backup_'+tod()+'.json';a.click();
+  toast('📤 Data imepakiwa!');
+}
+function clearDB(){
+  if(!confirm('Futa data YOTE?'))return;
+  if(!confirm('Una uhakika kabisa?'))return;
+  localStorage.removeItem('dl_db');DB=JSON.parse(JSON.stringify(DFLDB));renderAll();
+  toast('🗑 Data imefutwa','err');
+}
+
+// ════════════════════════════════════════════════════════════
+// UI HELPERS
+// ════════════════════════════════════════════════════════════
+function showMod(id){document.getElementById(id).classList.add('on');}
+function hideMod(id){document.getElementById(id).classList.remove('on');}
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast on'+(type?' '+type:'');
+  setTimeout(()=>t.classList.remove('on'),2800);
+}
+function pop(icon,title,sub=''){
+  document.getElementById('pic2').textContent=icon;
+  document.getElementById('ptl').textContent=title;
+  document.getElementById('psb').textContent=sub;
+  document.getElementById('pop').classList.add('on');
+}
+function hidePop(){document.getElementById('pop').classList.remove('on');}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+loadDB();
+
+const _t=tod();
+const _f=nowUTC3();_f.setDate(_f.getDate()-30);const _fs=_f.toISOString().slice(0,10);
+['sfrom','rfrom'].forEach(id=>document.getElementById(id).value=_fs);
+['sto','rto'].forEach(id=>document.getElementById(id).value=_t);
+document.getElementById('lp').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('lu').addEventListener('keyup',e=>{if(e.key==='Enter')document.getElementById('lp').focus();});
+</script>
+</body>
+</html>
