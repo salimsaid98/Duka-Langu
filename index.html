@@ -201,6 +201,10 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
 @keyframes spin{to{transform:translateY(-50%) rotate(360deg);}}
 
 .empty{text-align:center;padding:30px 20px;color:var(--t3);}
+.pgbar{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;margin-top:4px;}
+.pgbtn{background:var(--c);border:1px solid var(--br);border-radius:8px;padding:7px 14px;color:var(--tx);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;}
+.pgbtn:disabled{opacity:.35;cursor:default;}
+.pginfo{font-size:11px;color:var(--t2);font-family:'Syne',sans-serif;font-weight:600;}
 .empty .ei{font-size:36px;margin-bottom:8px;}
 .empty p{font-size:12px;}
 ::-webkit-scrollbar{width:4px;}
@@ -218,7 +222,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
     <div class="fl"><label>Jina la Mtumiaji</label><input type="text" id="lu" placeholder="admin"></div>
     <div class="fl"><label>Nywila</label><input type="password" id="lp" placeholder="••••••"></div>
     <button class="lbtn" id="loginBtn" onclick="doLogin()">Ingia →</button>
-    <!-- <div class="lhint">Default: admin / 1234</div> -->
+    <div class="lhint">Default: admin / 1234</div>
   </div>
 </div>
 
@@ -467,7 +471,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
 // ════════════════════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════════════════════
-let API = 'https://script.google.com/macros/s/AKfycbzTSWBqk3YJViBLHA7V2cWgpce0wvitOl5kHJ23h0zyVmJqdS-Zjd1cLe34boSwI25h4Q/exec';
+let API = 'https://script.google.com/macros/s/AKfycbzSlb_1NWz_3LuOkcJ7MQaxGGhcgJoCDajE-AgmggYrEm0BSgIt2Oo4aWI0HPEZhlEI-Q/exec';
 
 // ════════════════════════════════════════════════════════════
 // LOCAL DB
@@ -488,6 +492,9 @@ const DFLDB = {
 
 let DB=JSON.parse(JSON.stringify(DFLDB));
 let ME=null, CF='all', QTY={}, ST=null, BUSY=false;
+// Pagination state
+const PG = { sales:1, profile:1, logs:1, home_debt:1, home_rec:1 };
+const PG_SIZE = 5;
 
 function loadDB(){
   try{const s=localStorage.getItem('dl_db');if(s){DB={...DFLDB,...JSON.parse(s)};if(!DB.pending)DB.pending={customers:[],sales:[],payments:[],products:[],users:[]};}}catch(e){}
@@ -732,14 +739,20 @@ function renderHome(){
   document.getElementById('hu').textContent=uc;
   document.getElementById('hpr').textContent=DB.products.filter(p=>p.active).length;
 
-  const debtors=DB.customers.filter(c=>(Number(c.balance)||0)>0).sort((a,b)=>b.balance-a.balance).slice(0,5);
-  document.getElementById('hdebt').innerHTML=debtors.length
-    ?debtors.map(c=>`<div class="card"><div class="crow" onclick="openProfile('${c.id}')"><div><div class="cn">${c.name}</div><div class="cs">${c.phone||'—'}</div></div><div class="bdg br2">Sh ${fn(c.balance)}</div></div></div>`).join('')
+  const allDebtors=DB.customers.filter(c=>(Number(c.balance)||0)>0).sort((a,b)=>b.balance-a.balance);
+  const dtTotal=Math.ceil(allDebtors.length/PG_SIZE)||1;
+  if(PG.home_debt>dtTotal)PG.home_debt=1;
+  const debtors=allDebtors.slice((PG.home_debt-1)*PG_SIZE,PG.home_debt*PG_SIZE);
+  document.getElementById('hdebt').innerHTML=allDebtors.length
+    ?(debtors.map(c=>`<div class="card"><div class="crow" onclick="openProfile('${c.id}')"><div><div class="cn">${c.name}</div><div class="cs">${c.phone||'—'}</div></div><div class="bdg br2">Sh ${fn(c.balance)}</div></div></div>`).join('')+pgBar('home_debt',PG.home_debt,dtTotal))
     :'<div class="empty"><div class="ei">🎉</div><p>Hakuna madeni!</p></div>';
 
-  const rec=[...DB.sales].sort((a,b)=>b.createdAt-a.createdAt).slice(0,5);
-  document.getElementById('hrec').innerHTML=rec.length
-    ?rec.map(s=>{const c=DB.customers.find(x=>x.id===s.custId);return`<div class="card"><div class="crow"><div><div class="cn">${c?c.name:'—'}</div><div class="cs">${fd(s.date)} · ${s.staffName||''}</div></div><div class="bdg bo2">Sh ${fn(s.total)}</div></div></div>`;}).join('')
+  const allRec=[...DB.sales].sort((a,b)=>b.createdAt-a.createdAt);
+  const recTotal=Math.ceil(allRec.length/PG_SIZE)||1;
+  if(PG.home_rec>recTotal)PG.home_rec=1;
+  const rec=allRec.slice((PG.home_rec-1)*PG_SIZE,PG.home_rec*PG_SIZE);
+  document.getElementById('hrec').innerHTML=allRec.length
+    ?(rec.map(s=>{const c=DB.customers.find(x=>x.id===s.custId);return`<div class="card"><div class="crow"><div><div class="cn">${c?c.name:'—'}</div><div class="cs">${fd(s.date)} · ${s.staffName||''}</div></div><div class="bdg bo2">Sh ${fn(s.total)}</div></div></div>`;}).join('')+pgBar('home_rec',PG.home_rec,recTotal))
     :'<div class="empty"><div class="ei">📋</div><p>Hakuna mauzo bado</p></div>';
 }
 
@@ -827,6 +840,8 @@ function fillCustDD(){
 
 // ── Customer Profile ──────────────────────────────────────────
 function openProfile(id){
+  if(!id) return;
+  PG.profile = PG.profile || 1; // keep page if same profile, reset handled by pgGo
   const c=DB.customers.find(x=>x.id===id);
   if(!c)return;
   const orders=DB.sales.filter(s=>s.custId===id).sort((a,b)=>b.createdAt-a.createdAt);
@@ -847,7 +862,7 @@ function openProfile(id){
     if(t.type==='pay'){rd-=t.amt;if(rd<=0&&t.amt>0)clr=t.date;}
   });
   const debt=Number(c.balance)||0;
-  document.getElementById('cpcon').innerHTML=`
+  const cpcon=document.getElementById('cpcon');if(cpcon.dataset.cid!==id){PG.profile=1;}cpcon.dataset.cid=id;cpcon.innerHTML=`
     <div class="ph">
       <div class="pav">${c.name[0].toUpperCase()}</div>
       <div class="pname">${c.name}</div>
@@ -860,7 +875,7 @@ function openProfile(id){
       ${clr?`<div style="margin-top:8px;background:rgba(62,207,142,.1);border-radius:8px;padding:7px;font-size:11px;color:var(--g);text-align:center">✅ Deni lilikamilika: <strong>${fd(clr)}</strong></div>`:''}
     </div>
     <div class="sh"><div class="st">📋 Historia (${tl.length})</div></div>
-    <div class="tl2">${tl.length?tl.slice(0,30).map(t=>`
+    <div class="tl2">${tl.length?tl.slice((PG.profile-1)*PG_SIZE, PG.profile*PG_SIZE).map(t=>`
       <div class="ti">
         <div class="td ${t.type==='ord'?'ord':'pay'}"></div>
         <div class="tinfo">
@@ -870,7 +885,7 @@ function openProfile(id){
           ${t.type==='ord'&&t.ip>0?`<div class="tmeta" style="color:var(--g)">Alilipa awali: Sh ${fn(t.ip)}</div>`:''}
         </div>
         <div class="tam" style="color:${t.type==='ord'?'var(--r)':'var(--g)'}">${t.type==='ord'?'−':'+'}Sh ${fn(t.amt)}</div>
-      </div>`).join(''):'<div class="empty"><p>Hakuna historia</p></div>'}</div>`;
+      </div>`).join('')+'':'<div class="empty"><p>Hakuna historia</p></div>'}${tl.length>PG_SIZE?pgBar('profile',PG.profile,Math.ceil(tl.length/PG_SIZE)):''}</div>`;
   showMod('mcp');
 }
 
@@ -904,22 +919,55 @@ function confirmPay(){
 
 // ── WA / SMS ──────────────────────────────────────────────────
 function buildMsg(cid){
-  const c=DB.customers.find(x=>x.id===cid);
-  const csal=DB.sales.filter(s=>s.custId===cid).sort((a,b)=>a.createdAt-b.createdAt);
-  const cpay=DB.payments.filter(p=>p.custId===cid);
-  const tp=cpay.reduce((a,p)=>a+(Number(p.amount)||0),0);
-  const to2=csal.reduce((a,s)=>a+(Number(s.total)||0),0);
-  const lp=cpay.sort((a,b)=>b.createdAt-a.createdAt)[0];
-  let rec='';
-  csal.slice(-3).forEach(s=>{
-    const items=Array.isArray(s.items)?s.items:[];
-    rec+=`📅 Tarehe: ${fd(s.date)}\n`+items.map(i=>{const p=DB.products.find(x=>x.id===i.pid);return`  ${p?p.icon:''} ${p?p.name:'?'} ×${i.qty} — Sh ${fn(i.qty*(p?p.price:0))}`;}).join('\n')+`\n  Jumla: Sh ${fn(s.total)}\n\n`;
-  });
-  const rem=Number(c.balance)||0;
-  return`Habari ${c.name}! 🙏\n\n━━━━━━━━━━━━━\n🧾 RISITI — DukaLangu\n━━━━━━━━━━━━━\n\n${rec}💰 Jumla Yote: Sh ${fn(to2)}\n✅ Umelipa: Sh ${fn(tp)}\n${rem<=0?'✅ Deni limekamilika'+(lp?' tarehe '+fd(lp.date):'')+'!':'⏳ Kinachobaki: *Sh '+fn(rem)+'*'+(lp?'\n📅 Malipo ya mwisho: '+fd(lp.date):'')}\n\nAsante! 🛍️`;
+  const c    = DB.customers.find(x=>x.id===cid);
+  const LINE = '━━━━━━━━━━━━━━━━━━';
+  const bal  = Number(c.balance)||0;
+
+  const lastOrder = DB.sales
+    .filter(s=>s.custId===cid)
+    .sort((a,b)=>b.createdAt-a.createdAt)[0];
+
+  const lastPay = DB.payments
+    .filter(p=>p.custId===cid)
+    .sort((a,b)=>b.createdAt-a.createdAt)[0];
+
+  let msg = 'Habari '+c.name+'!\n\n';
+
+  // 1. Malipo ya mwisho kwanza
+  if(lastPay){
+    const meth = lastPay.method==='mpesa'?'M-Pesa/Tigo':'Cash';
+    msg += '💰 MALIPO YA MWISHO — '+fd(String(lastPay.date||'').slice(0,10))+'\n';
+    msg += LINE+'\n';
+    msg += 'Kiasi:  Sh '+fn(Number(lastPay.amount)||0)+'\n';
+    msg += 'Njia:   '+meth+'\n';
+    msg += LINE+'\n\n';
+  }
+
+  // 2. Order ya mwisho
+  if(lastOrder){
+    const items = Array.isArray(lastOrder.items)?lastOrder.items:[];
+    const itemLines = items.map(i=>{
+      const p = DB.products.find(x=>x.id===i.pid);
+      return (p?p.icon:'📦')+' '+(p?p.name:'Bidhaa')+' ×'+(Number(i.qty)||0)+'   Sh '+fn((Number(i.qty)||0)*(Number(i.price)||0));
+    }).join('\n');
+    msg += '📦 ORDER YA MWISHO — '+fd(String(lastOrder.date||'').slice(0,10))+'\n';
+    msg += LINE+'\n';
+    msg += itemLines+'\n';
+    msg += LINE+'\n';
+    msg += 'Jumla:  Sh '+fn(Number(lastOrder.total)||0)+'\n\n';
+  }
+
+  // 3. Deni la sasa
+  msg += '💳 DENI LA SASA\n';
+  msg += LINE+'\n';
+  msg += (bal>0 ? '⏳ *DENI LOTE:  Sh '+fn(bal)+'*' : '✅ *Deni limekamilika. Asante sana!*')+'\n';
+  msg += LINE+'\n\n';
+  msg += 'Tafadhali lipa unapoweza.\nAsante! 🛍️\n— IRELAND BAKERY';
+  return msg;
 }
-function sendWA(cid){const c=DB.customers.find(x=>x.id===cid);const ph=(c.phone||'').replace(/\s+/g,'').replace(/^\+/,'');window.open(ph?`https://wa.me/${ph}?text=${encodeURIComponent(buildMsg(cid))}`:`https://wa.me/?text=${encodeURIComponent(buildMsg(cid))}`,'_blank');logAct('WA',c.name);}
-function sendSMS(cid){const c=DB.customers.find(x=>x.id===cid);const ph=(c.phone||'').replace(/\s+/g,'');window.open(`sms:${ph}?body=${encodeURIComponent(buildMsg(cid))}`);logAct('SMS',c.name);}
+
+function sendWA(cid){const c=DB.customers.find(x=>x.id===cid);const ph=(c.phone||'').replace(/\s+/g,'').replace(/^\+/,'');const msg=encodeURIComponent(buildMsg(cid));window.open(ph?'https://wa.me/'+ph+'?text='+msg:'https://wa.me/?text='+msg,'_blank');logAct('WA',c.name);}
+function sendSMS(cid){const c=DB.customers.find(x=>x.id===cid);const ph=(c.phone||'').replace(/\s+/g,'');const msg=encodeURIComponent(buildMsg(cid));window.open('sms:'+ph+'?body='+msg);logAct('SMS',c.name);}
 
 // ════════════════════════════════════════════════════════════
 // SALES
@@ -972,12 +1020,15 @@ function renderSalesList(){
   if(to)list=list.filter(s=>s.date<=to);
   const el=document.getElementById('slist');
   if(!list.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><p>Hakuna mauzo</p></div>';return;}
-  el.innerHTML=list.slice(0,50).map(s=>{
+  const totalPages = Math.ceil(list.length/PG_SIZE);
+  if(PG.sales > totalPages) PG.sales = 1;
+  const paged = list.slice((PG.sales-1)*PG_SIZE, PG.sales*PG_SIZE);
+  el.innerHTML = paged.map(s=>{
     const c=DB.customers.find(x=>x.id===s.custId);
     const items=Array.isArray(s.items)?s.items:[];
     const sm=items.map(i=>{const p=DB.products.find(x=>x.id===i.pid);return(p?p.icon:'?')+'×'+i.qty;}).join(' ');
     return`<div class="card"><div class="crow"><div><div class="cn">${c?c.name:'—'}</div><div class="cs">${fd(s.date)} · ${sm} · ${s.staffName||''}</div></div><div><div class="bdg bo2">Sh ${fn(s.total)}</div>${(Number(s.initPay)||0)>0?`<div class="bdg bg2" style="font-size:10px;margin-top:3px">Alipa Sh ${fn(s.initPay)}</div>`:''}</div></div></div>`;
-  }).join('');
+  }).join('') + pgBar('sales', PG.sales, totalPages);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1099,7 +1150,10 @@ async function loadLogs(){
     const r=await api('getLogs');
     if(!r.logs?.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><p>Hakuna logs</p></div>';return;}
     const icons={LOGIN:'🔑',LOGOUT:'🚪',SALE:'📦',PAYMENT:'💰',NEW_CUST:'👤',EDIT_CUST:'✏️',DEL_CUST:'🗑',NEW_PROD:'🛒',PUSH:'☁️',WA:'📲',SMS:'💬'};
-    el.innerHTML='<div class="card" style="padding:10px 14px">'+r.logs.map(l=>`
+    const totalLogPg = Math.ceil(r.logs.length/PG_SIZE);
+    if(PG.logs>totalLogPg) PG.logs=1;
+    const pagedLogs = r.logs.slice((PG.logs-1)*PG_SIZE, PG.logs*PG_SIZE);
+    el.innerHTML='<div class="card" style="padding:10px 14px">'+pagedLogs.map(l=>`
       <div class="li">
         <span style="font-size:16px">${icons[l.action]||'📌'}</span>
         <div style="flex:1">
@@ -1107,7 +1161,7 @@ async function loadLogs(){
           <div class="ld">${l.detail||'—'}</div>
           <div class="lt">${fdt(l.time||l.ts)}</div>
         </div>
-      </div>`).join('')+'</div>';
+      </div>`).join('')+pgBar('logs',PG.logs,totalLogPg)+'</div>';
   }catch(e){el.innerHTML='<div class="empty"><div class="ei">❌</div><p>'+e.message+'</p></div>';}
 }
 
@@ -1168,6 +1222,19 @@ function clearDB(){
 // ════════════════════════════════════════════════════════════
 // UI HELPERS
 // ════════════════════════════════════════════════════════════
+function pgBar(key, cur, total){
+  if(total<=1) return '';
+  const prev = cur>1 ? `<button class="pgbtn" onclick="pgGo('${key}',${cur-1})">← Nyuma</button>` : '<button class="pgbtn" disabled>← Nyuma</button>';
+  const next = cur<total ? `<button class="pgbtn" onclick="pgGo('${key}',${cur+1})">Mbele →</button>` : '<button class="pgbtn" disabled>Mbele →</button>';
+  return `<div class="pgbar">${prev}<span class="pginfo">Ukurasa ${cur} / ${total}</span>${next}</div>`;
+}
+function pgGo(key, page){
+  PG[key] = page;
+  if(key==='sales') renderSalesList();
+  if(key==='profile') openProfile(document.getElementById('cpcon')?.dataset?.cid);
+  if(key==='logs') loadLogs();
+  if(key==='home_debt'||key==='home_rec') renderHome();
+}
 function showMod(id){document.getElementById(id).classList.add('on');}
 function hideMod(id){document.getElementById(id).classList.remove('on');}
 function toast(msg,type=''){
