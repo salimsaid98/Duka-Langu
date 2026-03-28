@@ -201,6 +201,45 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
 @keyframes spin{to{transform:translateY(-50%) rotate(360deg);}}
 
 .empty{text-align:center;padding:30px 20px;color:var(--t3);}
+@media print{
+  .top,.sbar,.nav,.sbtn,.ibtn,.ar,.pgbar,.tab-row,.sh .sa2,
+  #LS,button:not(.print-keep){display:none!important;}
+  body{background:#fff!important;color:#000!important;}
+  .pg{display:block!important;padding:10px!important;}
+  .card,.rc,.pend-card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid;}
+  .bdg,.sv,.sv2{color:#000!important;}
+}
+.print-btn{background:var(--b);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;}
+.rep-section{background:var(--c);border:1px solid var(--br);border-radius:var(--rad);padding:13px;margin-bottom:10px;}
+.rep-sec-title{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.mov-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--br);font-size:12px;}
+.mov-item:last-child{border:none;}
+.mov-left{flex:1;}
+.mov-name{font-weight:600;font-size:13px;}
+.mov-date{font-size:10px;color:var(--t2);}
+.mov-right{text-align:right;}
+.mov-amt{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;}
+.mov-bal{font-size:10px;color:var(--t2);}
+.summary-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid var(--br);}
+.summary-row:last-child{border:none;}
+.summary-row.total{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;padding-top:8px;}
+/* Pending orders */
+.pend-card{background:var(--c);border:1px solid var(--br);border-radius:var(--rad);margin-bottom:8px;overflow:hidden;border-left:3px solid var(--a);}
+.pend-card.cash-card{border-left-color:var(--g);}
+.pend-header{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;cursor:pointer;}
+.pend-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.pend-sub{font-size:11px;color:var(--t2);margin-top:2px;}
+.pend-body{display:none;border-top:1px solid var(--br);padding:12px 14px;}
+.pend-body.on{display:block;}
+.pend-item{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--br);}
+.pend-item:last-child{border:none;}
+.pend-total{display:flex;justify-content:space-between;padding:8px 0 0;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.status-dot.pending{background:var(--a);}
+.status-dot.cash{background:var(--g);}
+.tab-row{display:flex;gap:6px;margin-bottom:12px;}
+.tab-btn{flex:1;padding:9px;border-radius:8px;border:1px solid var(--br);background:var(--c);color:var(--t2);font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-align:center;}
+.tab-btn.on{background:var(--a);color:#000;border-color:var(--a);}
 .pgbar{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;margin-top:4px;}
 .pgbtn{background:var(--c);border:1px solid var(--br);border-radius:8px;padding:7px 14px;color:var(--tx);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;}
 .pgbtn:disabled{opacity:.35;cursor:default;}
@@ -222,7 +261,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
     <div class="fl"><label>Jina la Mtumiaji</label><input type="text" id="lu" placeholder="admin"></div>
     <div class="fl"><label>Nywila</label><input type="password" id="lp" placeholder="••••••"></div>
     <button class="lbtn" id="loginBtn" onclick="doLogin()">Ingia →</button>
-    <!-- <div class="lhint">Default: admin / 1234</div> -->
+    <div class="lhint">Default: admin / 1234</div>
   </div>
 </div>
 
@@ -307,13 +346,37 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
     <div id="prlist"></div>
   </div>
 
+  <!-- ORDERS (pending + cash) -->
+  <div class="pg" id="pg-orders">
+    <div class="sh"><div class="st">📋 Orodha ya Orders</div><div class="sa2" onclick="showMod('mneworder')">+ Order Mpya</div></div>
+    <div class="df">
+      <input type="date" id="ord-from" onchange="renderOrdList()">
+      <span>—</span>
+      <input type="date" id="ord-to" onchange="renderOrdList()">
+    </div>
+    <div class="tab-row">
+      <button class="tab-btn on" id="tab-pend" onclick="setOrdTab('pending',this)">⏳ Mikopo</button>
+      <button class="tab-btn" id="tab-cash" onclick="setOrdTab('cash',this)">✅ Cash</button>
+    </div>
+    <div id="ordlist"></div>
+  </div>
+
   <!-- REPORTS (admin) -->
   <div class="pg" id="pg-rep">
-    <div class="sh"><div class="st">📊 Ripoti</div></div>
+    <div class="sh">
+      <div class="st">📊 Ripoti</div>
+      <button class="print-btn print-keep" onclick="window.print()">🖨️ Print</button>
+    </div>
     <div class="df">
       <input type="date" id="rfrom" onchange="renderRep()">
       <span>—</span>
       <input type="date" id="rto" onchange="renderRep()">
+    </div>
+    <div class="tab-row" style="margin-bottom:10px">
+      <button class="tab-btn on" id="rtab-summary" onclick="setRepTab('summary',this)">📊 Muhtasari</button>
+      <button class="tab-btn" id="rtab-debt" onclick="setRepTab('debt',this)">💳 Madeni</button>
+      <button class="tab-btn" id="rtab-cash" onclick="setRepTab('cash',this)">💵 Cash</button>
+      <button class="tab-btn" id="rtab-mov" onclick="setRepTab('mov',this)">📈 Movements</button>
     </div>
     <div id="repout"></div>
   </div>
@@ -357,6 +420,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
     <div class="ni" onclick="nav('pg-custs')"><div class="ic">👥</div><div class="lb">Wateja</div></div>
     <div class="ni" onclick="nav('pg-sales')"><div class="ic">📦</div><div class="lb">Mauzo</div></div>
     <div class="ni" onclick="nav('pg-prods')"><div class="ic">🛒</div><div class="lb">Bidhaa</div></div>
+    <div class="ni" onclick="nav('pg-orders')"><div class="ic">📋</div><div class="lb">Orders</div></div>
     <div class="ni adm" onclick="nav('pg-rep')"><div class="ic">📊</div><div class="lb">Ripoti</div></div>
     <div class="ni adm" onclick="nav('pg-logs')"><div class="ic">🔍</div><div class="lb">Logs</div></div>
     <div class="ni adm" onclick="nav('pg-set')"><div class="ic">⚙️</div><div class="lb">Mipangilio</div></div>
@@ -440,6 +504,32 @@ body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-s
   </div>
 </div></div>
 
+<!-- New Pending Order -->
+<div class="ov" id="mneworder"><div class="mod">
+  <div class="mt">📋 Order Mpya</div>
+  <div class="fl2"><label>Mteja</label>
+    <select id="no-cust" style="background:var(--ib)"><option value="">— Chagua Mteja —</option></select>
+    <div style="margin-top:4px;font-size:11px;color:var(--t2)">Mpya? <span style="color:var(--a);cursor:pointer;font-weight:600" onclick="hideMod('mneworder');showMod('mc')">+ Sajili</span></div>
+  </div>
+  <div class="fl2"><label>Bidhaa</label><div class="pgrid" id="no-pgrid"></div></div>
+  <div class="fl2"><label>Aina ya Malipo</label>
+    <select id="no-type" style="background:var(--ib)" onchange="toggleInitPay()">
+      <option value="pending">⏳ Mkopo — Atalipa Baadaye</option>
+      <option value="cash">✅ Cash — Analipa Sasa</option>
+      <option value="mpesa">✅ M-Pesa — Analipa Sasa</option>
+    </select>
+  </div>
+  <div class="fl2" id="no-initpay-row" style="display:none">
+    <label>Kiasi Alicholipa (Sh)</label>
+    <input type="number" id="no-initpay" placeholder="0" min="0" style="background:var(--ib);border:1px solid var(--br);border-radius:8px;padding:9px 12px;color:var(--tx);width:100%;font-family:inherit;font-size:13px;">
+  </div>
+  <div class="tbar"><span class="tl">Jumla</span><span class="tv" id="no-total">Sh 0</span></div>
+  <div class="mft">
+    <button class="mcan" onclick="hideMod('mneworder')">Rudi</button>
+    <button class="btn bo" style="flex:1;padding:11px" onclick="saveNewOrder()">Hifadhi Order</button>
+  </div>
+</div></div>
+
 <!-- Add User -->
 <div class="ov" id="mu"><div class="mod">
   <div class="mt">👤 Mtumiaji Mpya</div>
@@ -487,17 +577,19 @@ const DFLDB = {
     {id:'p5',name:'Mini',icon:'🧁',price:600,unit:'pkt',active:true},
   ],
   sales:[],payments:[],
-  pending:{customers:[],sales:[],payments:[],products:[],users:[]},
+  orders:[],  // pending/cash orders before approval
+  pending:{customers:[],sales:[],payments:[],products:[],users:[],orders:[]},
 };
 
 let DB=JSON.parse(JSON.stringify(DFLDB));
 let ME=null, CF='all', QTY={}, ST=null, BUSY=false;
 // Pagination state
-const PG = { sales:1, profile:1, logs:1, home_debt:1, home_rec:1 };
+const PG = { sales:1, profile:1, logs:1, home_debt:1, home_rec:1, orders:1 };
 const PG_SIZE = 5;
 
 function loadDB(){
-  try{const s=localStorage.getItem('dl_db');if(s){DB={...DFLDB,...JSON.parse(s)};if(!DB.pending)DB.pending={customers:[],sales:[],payments:[],products:[],users:[]};}}catch(e){}
+  try{const s=localStorage.getItem('dl_db');if(s){DB={...DFLDB,...JSON.parse(s)};if(!DB.pending)DB.pending={customers:[],sales:[],payments:[],products:[],users:[],orders:[]};
+if(!DB.orders)DB.orders=[];}}catch(e){}
 }
 function saveDB(){localStorage.setItem('dl_db',JSON.stringify(DB));}
 function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
@@ -592,7 +684,7 @@ async function push(){
   if(!API||!hasPending()||BUSY)return;
   try{
     BUSY=true; setSS('spin','Inatuma...');
-    await api('push',{username:ME?.name,changes:DB.pending});
+    await api('push',{username:ME?.name,changes:{...DB.pending,orders:DB.pending.orders||[]}});
     DB.pending={customers:[],sales:[],payments:[],products:[],users:[]};
     saveDB();
     setSS('ok','Sync · '+ftime());
@@ -718,11 +810,12 @@ function nav(id){
   if(id==='pg-sales'){buildPGrid();fillCustDD();renderSalesList();}
   if(id==='pg-prods')renderProds();
   if(id==='pg-rep')renderRep();
+  if(id==='pg-orders'){buildNoPGrid();renderOrdList();}
   if(id==='pg-logs')loadLogs();
   if(id==='pg-set')renderSet();
 }
 
-function renderAll(){renderHome();renderCusts();fillCustDD();buildPGrid();renderSalesList();renderProds();if(isAdm())renderRep();renderSet();}
+function renderAll(){renderHome();renderCusts();fillCustDD();buildPGrid();renderSalesList();renderProds();renderOrdList();if(isAdm())renderRep();renderSet();}
 
 // ════════════════════════════════════════════════════════════
 // HOME
@@ -737,6 +830,10 @@ function renderHome(){
   document.getElementById('hc').textContent=DB.customers.length;
   document.getElementById('hs').textContent='Sh '+fn(ts);
   document.getElementById('hu').textContent=uc;
+  // Pending orders count on dashboard
+  const pendCount=(DB.orders||[]).filter(o=>o.status==='pending').length;
+  const huEl=document.getElementById('hu');
+  if(huEl && pendCount>0) huEl.textContent=uc+' | ⏳'+pendCount;
   document.getElementById('hpr').textContent=DB.products.filter(p=>p.active).length;
 
   const allDebtors=DB.customers.filter(c=>(Number(c.balance)||0)>0).sort((a,b)=>b.balance-a.balance);
@@ -1091,52 +1188,234 @@ function delProd(id){
 // ════════════════════════════════════════════════════════════
 // REPORTS
 // ════════════════════════════════════════════════════════════
-function renderRep(){
-  if(!isAdm())return;
-  const from=document.getElementById('rfrom').value||'2020-01-01';
-  const to=document.getElementById('rto').value||tod();
-  const sales=DB.sales.filter(s=>s.date>=from&&s.date<=to);
-  const pays=DB.payments.filter(p=>p.date>=from&&p.date<=to);
-  const tS=sales.reduce((a,s)=>a+(Number(s.total)||0),0);
-  const tP=pays.reduce((a,p)=>a+(Number(p.amount)||0),0);
-  const tD=DB.customers.reduce((a,c)=>a+(Number(c.balance)||0),0);
-  // Product stats
-  const ps={};DB.products.forEach(p=>{ps[p.id]={name:p.name,icon:p.icon,qty:0,rev:0};});
-  sales.forEach(s=>{(Array.isArray(s.items)?s.items:[]).forEach(i=>{if(ps[i.pid]){ps[i.pid].qty+=Number(i.qty)||0;ps[i.pid].rev+=(Number(i.qty)||0)*(Number(i.price)||0);}});});
-  const tp2=Object.values(ps).sort((a,b)=>b.rev-a.rev);
-  const maxR=tp2[0]?.rev||1;
-  // Staff
-  const stf={};sales.forEach(s=>{const n=s.staffName||'Haijulikani';if(!stf[n])stf[n]={s:0,r:0};stf[n].s++;stf[n].r+=Number(s.total)||0;});
-  // Top customers
-  const csm={};sales.forEach(s=>{if(!csm[s.custId])csm[s.custId]=0;csm[s.custId]+=Number(s.total)||0;});
-  const tc=Object.entries(csm).map(([id,t])=>({c:DB.customers.find(x=>x.id===id),t})).filter(x=>x.c).sort((a,b)=>b.t-a.t).slice(0,5);
-  const loyal=DB.customers.map(c=>({...c,oc:DB.sales.filter(s=>s.custId===c.id).length})).filter(c=>c.oc>=5).sort((a,b)=>b.oc-a.oc);
-
-  document.getElementById('repout').innerHTML=`
-    <div class="rc"><div class="rt">📊 Muhtasari · ${fd(from)} — ${fd(to)}</div>
-      <div class="sg">
-        <div class="si2"><div class="sl2">Mauzo Yote</div><div class="sv2 co">Sh ${fn(tS)}</div></div>
-        <div class="si2"><div class="sl2">Malipo Yote</div><div class="sv2 cg">Sh ${fn(tP)}</div></div>
-        <div class="si2"><div class="sl2">Madeni Yote</div><div class="sv2 cr">Sh ${fn(tD)}</div></div>
-        <div class="si2"><div class="sl2">Idadi Mauzo</div><div class="sv2">${sales.length}</div></div>
-      </div>
-    </div>
-    <div class="rc"><div class="rt">🛒 Bidhaa Zinazoongoza</div>
-      ${tp2.map((p,i)=>`<div class="bar"><div class="blbl">${p.icon} ${p.name}</div><div class="btr"><div class="bfill" style="width:${Math.round(p.rev/maxR*100)}%">Sh ${fn(p.rev)}</div></div></div>`).join('')}
-    </div>
-    <div class="rc"><div class="rt">👤 Mauzo kwa Mfanyakazi</div><div class="tlist">
-      ${Object.entries(stf).sort((a,b)=>b[1].r-a[1].r).map(([n,d],i)=>`<div class="ti2"><div style="display:flex;align-items:center;gap:8px"><div class="rbdg">${i+1}</div><div><div style="font-weight:600">${n}</div><div style="font-size:10px;color:var(--t2)">${d.s} mauzo</div></div></div><span style="font-weight:600;color:var(--a)">Sh ${fn(d.r)}</span></div>`).join('')||'<div style="color:var(--t3);font-size:12px;text-align:center;padding:10px">Hakuna data</div>'}
-    </div></div>
-    <div class="rc"><div class="rt">🏆 Wateja Wakubwa</div><div class="tlist">
-      ${tc.length?tc.map((x,i)=>`<div class="ti2"><div style="display:flex;align-items:center;gap:8px"><div class="rbdg">${i+1}</div><div><div style="font-weight:600">${x.c.name}</div><div style="font-size:10px;color:var(--t2)">${x.c.phone||'—'}</div></div></div><span style="font-weight:600;color:var(--a)">Sh ${fn(x.t)}</span></div>`).join(''):'<div style="color:var(--t3);font-size:12px;text-align:center;padding:10px">Hakuna data</div>'}
-    </div></div>
-    <div class="rc"><div class="rt">⭐ Wateja Sugu (5+ Orders)</div><div class="tlist">
-      ${loyal.length?loyal.map((c,i)=>`<div class="ti2"><div style="display:flex;align-items:center;gap:8px"><div class="rbdg">${i+1}</div><div><div style="font-weight:600">${c.name}</div><div style="font-size:10px;color:var(--t2)">${c.phone||'—'}</div></div></div><div style="text-align:right"><div style="font-weight:600">${c.oc} orders</div><div style="font-size:10px;color:${(Number(c.balance)||0)>0?'var(--r)':'var(--g)'}">Deni: Sh ${fn(c.balance||0)}</div></div></div>`).join(''):'<div style="color:var(--t3);font-size:12px;text-align:center;padding:10px">Bado hakuna (5+)</div>'}
-    </div></div>
-    <div class="rc"><div class="rt">📋 Wateja Wote (${DB.customers.length})</div><div class="tlist">
-      ${[...DB.customers].sort((a,b)=>(Number(b.balance)||0)-(Number(a.balance)||0)).map(c=>`<div class="ti2"><div><div style="font-weight:600">${c.name}</div><div style="font-size:10px;color:var(--t2)">${c.phone||'—'}</div></div><div class="bdg ${(Number(c.balance)||0)>0?'br2':'bg2'}">${(Number(c.balance)||0)>0?'Sh '+fn(c.balance):'Safi'}</div></div>`).join('')}
-    </div></div>`;
+function setRepTab(tab, el){
+  REP_TAB = tab;
+  document.querySelectorAll('#pg-rep .tab-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderRep();
 }
+
+function renderRep(){
+  if(!isAdm()) return;
+  const from = document.getElementById('rfrom').value || '2020-01-01';
+  const to   = document.getElementById('rto').value   || tod();
+  const el   = document.getElementById('repout');
+
+  const sales    = DB.sales.filter(s=>String(s.date||'').slice(0,10)>=from && String(s.date||'').slice(0,10)<=to);
+  const pays     = DB.payments.filter(p=>String(p.date||'').slice(0,10)>=from && String(p.date||'').slice(0,10)<=to);
+  const orders   = (DB.orders||[]).filter(o=>String(o.date||'').slice(0,10)>=from && String(o.date||'').slice(0,10)<=to);
+  const cashOrds = orders.filter(o=>o.status==='cash');
+  const pendOrds = orders.filter(o=>o.status==='pending'||o.status==='approved');
+
+  if(REP_TAB === 'summary') { el.innerHTML = repSummary(from,to,sales,pays,cashOrds,pendOrds); return; }
+  if(REP_TAB === 'debt')    { el.innerHTML = repDebt(from,to); return; }
+  if(REP_TAB === 'cash')    { el.innerHTML = repCash(from,to,cashOrds,pays); return; }
+  if(REP_TAB === 'mov')     { el.innerHTML = repMovements(from,to); return; }
+}
+
+// ── Summary Report ──────────────────────────────────────────
+function repSummary(from,to,sales,pays,cashOrds,pendOrds){
+  const tSales = sales.reduce((a,s)=>a+(Number(s.total)||0),0);
+  const tPays  = pays.reduce((a,p)=>a+(Number(p.amount)||0),0);
+  const tDebt  = DB.customers.reduce((a,c)=>a+(Number(c.balance)||0),0);
+  const tCash  = cashOrds.reduce((a,o)=>a+(Number(o.total)||0),0);
+
+  // Product stats
+  const ps={};
+  DB.products.forEach(p=>{ps[p.id]={name:p.name,icon:p.icon,qty:0,rev:0};});
+  sales.forEach(s=>{(Array.isArray(s.items)?s.items:[]).forEach(i=>{
+    if(ps[i.pid]){ps[i.pid].qty+=Number(i.qty)||0;ps[i.pid].rev+=(Number(i.qty)||0)*(Number(i.price)||0);}
+  });});
+  const topP = Object.values(ps).sort((a,b)=>b.rev-a.rev);
+  const maxR = topP[0]?.rev||1;
+
+  // Staff stats
+  const stf={};
+  sales.forEach(s=>{const n=s.staffName||'—';if(!stf[n])stf[n]={s:0,r:0,cash:0,debt:0};stf[n].s++;stf[n].r+=Number(s.total)||0;});
+  cashOrds.forEach(o=>{const n=o.staffName||'—';if(!stf[n])stf[n]={s:0,r:0,cash:0,debt:0};stf[n].cash+=Number(o.total)||0;});
+  pendOrds.forEach(o=>{const n=o.staffName||'—';if(!stf[n])stf[n]={s:0,r:0,cash:0,debt:0};stf[n].debt+=Number(o.total)||0;});
+
+  return `
+  <div class="rep-section">
+    <div class="rep-sec-title">📊 Muhtasari · ${fd(from)} — ${fd(to)}</div>
+    <div class="sg">
+      <div class="si2"><div class="sl2">Mauzo Yote</div><div class="sv2 co">Sh ${fn(tSales)}</div></div>
+      <div class="si2"><div class="sl2">Malipo Yote</div><div class="sv2 cg">Sh ${fn(tPays)}</div></div>
+      <div class="si2"><div class="sl2">Madeni Yote</div><div class="sv2 cr">Sh ${fn(tDebt)}</div></div>
+      <div class="si2"><div class="sl2">Cash Orders</div><div class="sv2 cg">Sh ${fn(tCash)}</div></div>
+    </div>
+  </div>
+  <div class="rep-section">
+    <div class="rep-sec-title">🛒 Bidhaa Zinazoongoza</div>
+    ${topP.map(p=>`<div class="bar"><div class="blbl">${p.icon} ${p.name}</div><div class="btr"><div class="bfill" style="width:${Math.round(p.rev/maxR*100)}%">Sh ${fn(p.rev)}</div></div></div>`).join('')}
+  </div>
+  <div class="rep-section">
+    <div class="rep-sec-title">👤 Mauzo kwa Mfanyakazi</div>
+    <div class="tlist">
+      ${Object.entries(stf).sort((a,b)=>b[1].r-a[1].r).map(([n,d],i)=>`
+        <div class="ti2">
+          <div style="display:flex;align-items:center;gap:8px"><div class="rbdg">${i+1}</div>
+          <div><div style="font-weight:600">${n}</div><div style="font-size:10px;color:var(--t2)">${d.s} mauzo</div></div></div>
+          <div style="text-align:right">
+            <div style="font-weight:600;color:var(--a)">Sh ${fn(d.r)}</div>
+            <div style="font-size:10px;color:var(--t2)">Cash: Sh ${fn(d.cash)} | Deni: Sh ${fn(d.debt)}</div>
+          </div>
+        </div>`).join('')||'<div class="empty" style="padding:10px"><p>Hakuna data</p></div>'}
+    </div>
+  </div>`;
+}
+
+// ── Debt Report ─────────────────────────────────────────────
+function repDebt(from,to){
+  const debtors = DB.customers
+    .filter(c=>(Number(c.balance)||0)>0)
+    .sort((a,b)=>(Number(b.balance)||0)-(Number(a.balance)||0));
+  const totalDebt = debtors.reduce((a,c)=>a+(Number(c.balance)||0),0);
+
+  // Per staff debt
+  const stfDebt = {};
+  (DB.orders||[]).filter(o=>o.status==='pending'||o.status==='approved')
+    .filter(o=>String(o.date||'').slice(0,10)>=from&&String(o.date||'').slice(0,10)<=to)
+    .forEach(o=>{
+      const n=o.staffName||'—';
+      if(!stfDebt[n])stfDebt[n]=0;
+      stfDebt[n]+=Number(o.total)||0;
+    });
+
+  return `
+  <div class="rep-section">
+    <div class="rep-sec-title">
+      💳 Orodha ya Madeni (${debtors.length} wateja)
+      <button class="print-btn print-keep" onclick="window.print()">🖨️</button>
+    </div>
+    <div class="summary-row total"><span>Jumla ya Madeni Yote</span><span style="color:var(--r)">Sh ${fn(totalDebt)}</span></div>
+    <div style="margin-top:10px">
+      ${debtors.map((c,i)=>{
+        const lastOrd = DB.sales.filter(s=>s.custId===c.id).sort((a,b)=>b.createdAt-a.createdAt)[0];
+        return`<div class="mov-item">
+          <div class="mov-left">
+            <div class="mov-name">${i+1}. ${c.name}</div>
+            <div class="mov-date">${c.phone||'—'} · Mwisho: ${lastOrd?fd(String(lastOrd.date||'').slice(0,10)):'—'}</div>
+          </div>
+          <div class="mov-right">
+            <div class="mov-amt cr">Sh ${fn(c.balance)}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${Object.keys(stfDebt).length?`
+    <div style="margin-top:14px;border-top:1px solid var(--br);padding-top:10px">
+      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:12px;margin-bottom:8px">Mikopo kwa Mfanyakazi</div>
+      ${Object.entries(stfDebt).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`
+        <div class="summary-row"><span>👤 ${n}</span><span style="font-weight:600;color:var(--r)">Sh ${fn(v)}</span></div>`).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+// ── Cash Report ─────────────────────────────────────────────
+function repCash(from,to,cashOrds,pays){
+  // Group cash orders by date
+  const byDate = {};
+  cashOrds.forEach(o=>{
+    const d=String(o.date||'').slice(0,10);
+    if(!byDate[d])byDate[d]=[];
+    byDate[d].push(o);
+  });
+
+  // Per staff cash
+  const stfCash = {};
+  cashOrds.forEach(o=>{
+    const n=o.staffName||'—';
+    if(!stfCash[n])stfCash[n]=0;
+    stfCash[n]+=Number(o.total)||0;
+  });
+
+  const totalCash = cashOrds.reduce((a,o)=>a+(Number(o.total)||0),0);
+
+  return `
+  <div class="rep-section">
+    <div class="rep-sec-title">
+      💵 Cash za Kila Siku · ${fd(from)} — ${fd(to)}
+      <button class="print-btn print-keep" onclick="window.print()">🖨️</button>
+    </div>
+    <div class="summary-row total"><span>Jumla ya Cash</span><span style="color:var(--g)">Sh ${fn(totalCash)}</span></div>
+    ${Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,ords])=>`
+      <div style="margin-top:12px">
+        <div style="font-family:Syne,sans-serif;font-weight:700;font-size:12px;color:var(--a);margin-bottom:6px">📅 ${fd(date)} · Sh ${fn(ords.reduce((a,o)=>a+(Number(o.total)||0),0))}</div>
+        ${ords.map(o=>{
+          const c=DB.customers.find(x=>x.id===o.custId);
+          const items=(Array.isArray(o.items)?o.items:[]).map(i=>{const p=DB.products.find(x=>x.id===i.pid);return(p?p.icon:'')+' '+(p?p.name:'?')+' ×'+i.qty;}).join(', ');
+          return`<div class="mov-item">
+            <div class="mov-left">
+              <div class="mov-name">${c?c.name:'—'}</div>
+              <div class="mov-date">${items} · ${o.staffName||'—'}</div>
+            </div>
+            <div class="mov-right"><div class="mov-amt cg">Sh ${fn(o.total)}</div></div>
+          </div>`;
+        }).join('')}
+      </div>`).join('')||'<div class="empty" style="padding:10px"><p>Hakuna cash orders</p></div>'}
+    ${Object.keys(stfCash).length?`
+    <div style="margin-top:14px;border-top:1px solid var(--br);padding-top:10px">
+      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:12px;margin-bottom:8px">Cash kwa Mfanyakazi</div>
+      ${Object.entries(stfCash).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`
+        <div class="summary-row"><span>👤 ${n}</span><span style="font-weight:600;color:var(--g)">Sh ${fn(v)}</span></div>`).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+// ── Movements Report ─────────────────────────────────────────
+function repMovements(from,to){
+  // For each customer with activity — show orders + payments + running balance
+  const activeCusts = DB.customers.filter(c=>{
+    const hasSales = DB.sales.some(s=>s.custId===c.id&&String(s.date||'').slice(0,10)>=from&&String(s.date||'').slice(0,10)<=to);
+    const hasPays  = DB.payments.some(p=>p.custId===c.id&&String(p.date||'').slice(0,10)>=from&&String(p.date||'').slice(0,10)<=to);
+    return hasSales||hasPays;
+  }).sort((a,b)=>a.name.localeCompare(b.name));
+
+  if(!activeCusts.length) return '<div class="empty"><div class="ei">📈</div><p>Hakuna movements katika kipindi hiki</p></div>';
+
+  return activeCusts.map(c=>{
+    const cSales = DB.sales.filter(s=>s.custId===c.id&&String(s.date||'').slice(0,10)>=from&&String(s.date||'').slice(0,10)<=to).sort((a,b)=>a.createdAt-b.createdAt);
+    const cPays  = DB.payments.filter(p=>p.custId===c.id&&String(p.date||'').slice(0,10)>=from&&String(p.date||'').slice(0,10)<=to).sort((a,b)=>a.createdAt-b.createdAt);
+    const tOrd   = cSales.reduce((a,s)=>a+(Number(s.total)||0),0);
+    const tPay   = cPays.reduce((a,p)=>a+(Number(p.amount)||0),0);
+
+    // Build movements timeline sorted by date
+    let moves = [
+      ...cSales.map(s=>({type:'order',date:s.date,ts:s.createdAt,amt:Number(s.total)||0,detail:(Array.isArray(s.items)?s.items:[]).map(i=>{const p=DB.products.find(x=>x.id===i.pid);return(p?p.name:'?')+' ×'+i.qty;}).join(', ')})),
+      ...cPays.map(p=>({type:'pay',date:p.date,ts:p.createdAt,amt:Number(p.amount)||0,detail:'Malipo · '+(p.method==='mpesa'?'M-Pesa':'Cash')}))
+    ].sort((a,b)=>a.ts-b.ts);
+
+    // Calculate running balance per move
+    let running = Number(c.balance)||0;
+    // Work backwards to find opening balance
+    const closingBal = running;
+    const netChange  = tOrd - tPay;
+    const openingBal = closingBal - netChange;
+
+    return `<div class="rep-section">
+      <div class="rep-sec-title">
+        👤 ${c.name} ${c.phone?'· '+c.phone:''}
+      </div>
+      <div class="summary-row"><span>Deni la Awali</span><span>Sh ${fn(openingBal)}</span></div>
+      ${moves.map(m=>`
+        <div class="mov-item">
+          <div class="mov-left">
+            <div class="mov-name" style="color:${m.type==='order'?'var(--r)':'var(--g)'}">${m.type==='order'?'📦 Mzigo':'💰 Malipo'}</div>
+            <div class="mov-date">📅 ${fd(String(m.date||'').slice(0,10))} · ${m.detail}</div>
+          </div>
+          <div class="mov-right">
+            <div class="mov-amt" style="color:${m.type==='order'?'var(--r)':'var(--g)'}">${m.type==='order'?'+':'-'}Sh ${fn(m.amt)}</div>
+          </div>
+        </div>`).join('')}
+      <div class="summary-row total">
+        <span>Jumla Mzigo: Sh ${fn(tOrd)} | Malipo: Sh ${fn(tPay)}</span>
+        <span style="color:${closingBal>0?'var(--r)':'var(--g)'}">Deni: Sh ${fn(closingBal)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 
 // ════════════════════════════════════════════════════════════
 // LOGS
@@ -1234,7 +1513,226 @@ function pgGo(key, page){
   if(key==='profile') openProfile(document.getElementById('cpcon')?.dataset?.cid);
   if(key==='logs') loadLogs();
   if(key==='home_debt'||key==='home_rec') renderHome();
+  if(key==='orders') renderOrdList();
 }
+// ════════════════════════════════════════════════════════════
+// ORDERS — PENDING & CASH
+// ════════════════════════════════════════════════════════════
+let ORD_TAB = 'pending'; // 'pending' or 'cash'
+let REP_TAB = 'summary';
+let NO_QTY  = {};
+
+function setOrdTab(tab, el){
+  ORD_TAB = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderOrdList();
+}
+
+function buildNoPGrid(){
+  // Fill customer dropdown
+  const sel = document.getElementById('no-cust');
+  if(sel){
+    sel.innerHTML = '<option value="">— Chagua Mteja —</option>' +
+      DB.customers.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>
+        `<option value="${c.id}">${c.name}${c.phone?' · '+c.phone:''}</option>`
+      ).join('');
+  }
+  // Build product grid
+  const grid = document.getElementById('no-pgrid');
+  if(!grid) return;
+  NO_QTY = {};
+  DB.products.filter(p=>p.active).forEach(p=>{ NO_QTY[p.id]=0; });
+  grid.innerHTML = DB.products.filter(p=>p.active).map(p=>`
+    <div class="pt">
+      <div class="ptop"><span class="pic">${p.icon}</span><div><div class="pn">${p.name}</div><div class="pp">Sh ${fn(p.price)}/${p.unit}</div></div></div>
+      <div class="qc">
+        <button class="qb" onclick="noAdj('${p.id}',-1)">−</button>
+        <input class="qi" type="number" id="noq${p.id}" value="0" min="0" oninput="noSet('${p.id}',this.value)">
+        <button class="qb" onclick="noAdj('${p.id}',1)">+</button>
+      </div>
+    </div>`).join('');
+  noUpdTotal();
+}
+
+function noAdj(pid,d){ NO_QTY[pid]=Math.max(0,(NO_QTY[pid]||0)+d); const el=document.getElementById('noq'+pid); if(el)el.value=NO_QTY[pid]; noUpdTotal(); }
+function noSet(pid,v){ NO_QTY[pid]=Math.max(0,parseInt(v)||0); noUpdTotal(); }
+function noUpdTotal(){
+  let t=0;
+  Object.entries(NO_QTY).forEach(([pid,qty])=>{ const p=DB.products.find(x=>x.id===pid); if(p)t+=qty*p.price; });
+  const el=document.getElementById('no-total');
+  if(el) el.textContent='Sh '+fn(t);
+}
+
+function toggleInitPay(){
+  const type = document.getElementById('no-type').value;
+  const row  = document.getElementById('no-initpay-row');
+  if(row) row.style.display = (type==='cash'||type==='mpesa') ? '' : 'none';
+}
+
+function saveNewOrder(){
+  const custId = document.getElementById('no-cust').value;
+  if(!custId){ toast('⚠️ Chagua mteja','err'); return; }
+  // Read qty from inputs
+  DB.products.filter(p=>p.active).forEach(p=>{
+    const el=document.getElementById('noq'+p.id);
+    if(el) NO_QTY[p.id]=Math.max(0,parseInt(el.value)||0);
+  });
+  const items = Object.entries(NO_QTY).filter(([,q])=>q>0).map(([pid,qty])=>{
+    const p=DB.products.find(x=>x.id===pid);
+    return {pid,qty,price:p.price};
+  });
+  if(!items.length){ toast('⚠️ Chagua bidhaa angalau moja','err'); return; }
+  const total  = items.reduce((s,i)=>s+i.qty*i.price,0);
+  const type   = document.getElementById('no-type').value;
+  const initPay= (type==='cash'||type==='mpesa') ? Math.min(parseInt(document.getElementById('no-initpay').value)||total, total) : 0;
+  const status = (type==='cash'||type==='mpesa') ? 'cash' : 'pending';
+
+  const ord = {
+    id:       gid(),
+    custId,
+    items,
+    total,
+    initPay,
+    method:   type,
+    status,          // 'pending' | 'cash' | 'approved'
+    date:     tod(),
+    createdAt:Date.now(),
+    staffName:ME?.name,
+  };
+
+  if(!DB.orders) DB.orders=[];
+  DB.orders.push(ord);
+  dirty('orders', ord);
+  saveDB();
+  hideMod('mneworder');
+  buildNoPGrid();
+  renderOrdList();
+  renderHome();
+  pop('📋', status==='cash'?'Order ya Cash Imehifadhiwa!':'Order ya Mkopo Imehifadhiwa!', DB.customers.find(c=>c.id===custId)?.name+' · Sh '+fn(total));
+  logAct('NEW_ORDER', DB.customers.find(c=>c.id===custId)?.name+' · Sh '+total+' · '+status);
+  push();
+}
+
+function approveOrder(oid){
+  const ord = DB.orders.find(x=>x.id===oid);
+  if(!ord) return;
+  if(!confirm('Thibitisha mzigo huu umekamilika?')) return;
+
+  const c = DB.customers.find(x=>x.id===ord.custId);
+  if(!c) return;
+
+  // Move to sales
+  const sr = {
+    id:        gid(),
+    custId:    c.id,
+    items:     ord.items,
+    total:     ord.total,
+    initPay:   ord.initPay||0,
+    method:    ord.method,
+    date:      ord.date,
+    createdAt: ord.createdAt,
+    staffName: ord.staffName,
+    approvedBy:ME?.name,
+    approvedAt:nowISO(),
+  };
+  DB.sales.push(sr);
+  dirty('sales', sr);
+
+  // Update balance
+  const debt = ord.total - (ord.initPay||0);
+  c.balance  = (Number(c.balance)||0) + debt;
+  dirty('customers', c);
+
+  // Record initial payment if any
+  if((ord.initPay||0) > 0){
+    const pr = {id:gid(),custId:c.id,amount:ord.initPay,method:ord.method,date:ord.date,createdAt:ord.createdAt,staffName:ord.staffName,saleId:sr.id};
+    DB.payments.push(pr);
+    dirty('payments', pr);
+  }
+
+  // Mark order approved
+  ord.status     = 'approved';
+  ord.approvedBy = ME?.name;
+  ord.approvedAt = nowISO();
+  dirty('orders', ord);
+
+  saveDB();
+  renderOrdList();
+  renderHome();
+  renderCusts();
+  pop('✅','Mzigo Umekamilika!', c.name+' · Sh '+fn(ord.total));
+  logAct('APPROVE_ORDER', c.name+' · Sh '+ord.total);
+  push();
+}
+
+function deleteOrder(oid){
+  if(!confirm('Futa order hii?')) return;
+  DB.orders = DB.orders.filter(x=>x.id!==oid);
+  saveDB();
+  renderOrdList();
+  toast('🗑 Order imefutwa');
+  push();
+}
+
+function renderOrdList(){
+  if(!DB.orders) DB.orders=[];
+  const fromEl = document.getElementById('ord-from');
+  const toEl   = document.getElementById('ord-to');
+  const from   = fromEl ? fromEl.value : '';
+  const to     = toEl   ? toEl.value   : '';
+  // Filter by tab + date, exclude approved, sort newest first
+  let list = DB.orders
+    .filter(o=> o.status === ORD_TAB)
+    .sort((a,b)=> b.createdAt - a.createdAt);
+  if(from) list = list.filter(o=> String(o.date||'').slice(0,10) >= from);
+  if(to)   list = list.filter(o=> String(o.date||'').slice(0,10) <= to);
+
+  const el = document.getElementById('ordlist');
+  if(!el) return;
+
+  if(!list.length){
+    el.innerHTML = '<div class="empty"><div class="ei">'+(ORD_TAB==='pending'?'⏳':'✅')+'</div><p>'+(ORD_TAB==='pending'?'Hakuna orders za mkopo':'Hakuna orders za cash')+'</p></div>';
+    return;
+  }
+
+  const totalPg = Math.ceil(list.length/PG_SIZE)||1;
+  if(!PG.orders) PG.orders=1;
+  if(PG.orders>totalPg) PG.orders=1;
+  const paged = list.slice((PG.orders-1)*PG_SIZE, PG.orders*PG_SIZE);
+
+  el.innerHTML = paged.map(o=>{
+    const c     = DB.customers.find(x=>x.id===o.custId);
+    const items = Array.isArray(o.items)?o.items:[];
+    const isPend= o.status==='pending';
+    const itemRows = items.map(i=>{
+      const p=DB.products.find(x=>x.id===i.pid);
+      return `<div class="pend-item"><span>${p?p.icon:''} ${p?p.name:'?'} ×${i.qty}</span><span>Sh ${fn((Number(i.qty)||0)*(Number(i.price)||0))}</span></div>`;
+    }).join('');
+
+    return `<div class="${isPend?'pend-card':'pend-card cash-card'}">
+      <div class="pend-header" onclick="tog('po${o.id}')">
+        <div>
+          <div class="pend-name">
+            <span class="status-dot ${isPend?'pending':'cash'}"></span>${c?c.name:'—'}
+          </div>
+          <div class="pend-sub">${fd(String(o.date||'').slice(0,10))} · ${o.staffName||''}</div>
+        </div>
+        <div class="bdg ${isPend?'bo2':'bg2'}">Sh ${fn(o.total)}</div>
+      </div>
+      <div class="pend-body" id="po${o.id}">
+        ${itemRows}
+        <div class="pend-total"><span>Jumla</span><span>Sh ${fn(o.total)}</span></div>
+        ${(Number(o.initPay)||0)>0?`<div style="font-size:11px;color:var(--g);margin-top:4px">✅ Alilipa: Sh ${fn(o.initPay)}</div>`:''}
+        <div class="ar" style="margin-top:10px">
+          ${isPend?`<button class="btn bg" onclick="approveOrder('${o.id}')">✅ Thibitisha Mzigo</button>`:''}
+          <button class="btn br3" onclick="deleteOrder('${o.id}')">🗑 Futa</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + pgBar('orders', PG.orders, totalPg);
+}
+
 function showMod(id){document.getElementById(id).classList.add('on');}
 function hideMod(id){document.getElementById(id).classList.remove('on');}
 function toast(msg,type=''){
@@ -1257,8 +1755,8 @@ loadDB();
 
 const _t=tod();
 const _f=nowUTC3();_f.setDate(_f.getDate()-30);const _fs=_f.toISOString().slice(0,10);
-['sfrom','rfrom'].forEach(id=>document.getElementById(id).value=_fs);
-['sto','rto'].forEach(id=>document.getElementById(id).value=_t);
+['sfrom','rfrom','ord-from'].forEach(id=>document.getElementById(id).value=_fs);
+['sto','rto','ord-to'].forEach(id=>document.getElementById(id).value=_t);
 document.getElementById('lp').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('lu').addEventListener('keyup',e=>{if(e.key==='Enter')document.getElementById('lp').focus();});
 </script>
